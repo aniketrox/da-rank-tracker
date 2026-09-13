@@ -19,6 +19,113 @@ body{margin:0;background:radial-gradient(circle at 80% 0%,#1a1640 0,#080b12 36%)
 h1,h2,h3{font-family:"Space Grotesk",sans-serif;margin:0}
 button,input,select,textarea{font:inherit}
 .app{max-width:1450px;margin:auto;padding:24px}
+
+/* Futuristic Cyber Loader Overlay */
+#loader-overlay{
+  position:fixed;
+  inset:0;
+  background:#06080f;
+  z-index:99999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+}
+#loader-overlay.fade-out{
+  opacity:0;
+  visibility:hidden;
+}
+.loader-core{
+  position:relative;
+  width:140px;
+  height:140px;
+  display:grid;
+  place-items:center;
+}
+.cyber-ring{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:2px solid transparent;
+}
+.cyber-ring.ring1{
+  border-top-color:var(--accent);
+  border-bottom-color:var(--accent);
+  animation:spin 1.8s linear infinite;
+}
+.cyber-ring.ring2{
+  inset:10px;
+  border-left-color:var(--accent2);
+  border-right-color:var(--accent2);
+  animation:spin-reverse 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+.cyber-ring.ring3{
+  inset:20px;
+  border-top-color:#38bdf8;
+  border-left-color:#38bdf8;
+  animation:spin 2.4s ease-in-out infinite;
+  opacity:0.7;
+}
+.loader-badge{
+  width:58px;
+  height:58px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#7c5cff,#23d5ab);
+  display:grid;
+  place-items:center;
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:800;
+  font-size:20px;
+  color:#061016;
+  box-shadow:0 0 35px rgba(124,92,255,0.45);
+  animation:pulse-scale 1.8s ease-in-out infinite;
+}
+.loader-title{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:17px;
+  letter-spacing:3px;
+  font-weight:700;
+  text-transform:uppercase;
+  margin-top:28px;
+  color:#f4f7fb;
+  text-shadow:0 0 20px rgba(124,92,255,0.3);
+}
+.loader-status{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:6px;
+  letter-spacing:1px;
+  min-height:16px;
+}
+.loader-progress-track{
+  width:220px;
+  height:4px;
+  background:#131c2d;
+  border-radius:99px;
+  margin-top:16px;
+  overflow:hidden;
+  border:1px solid #233048;
+}
+.loader-progress-bar{
+  width:0%;
+  height:100%;
+  background:linear-gradient(90deg,#7c5cff,#38bdf8,#23d5ab);
+  border-radius:99px;
+  transition:width 0.15s ease-out;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+@keyframes spin-reverse{
+  to{transform:rotate(-360deg)}
+}
+@keyframes pulse-scale{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06);box-shadow:0 0 45px rgba(35,213,171,0.55)}
+}
+
 .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
 .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#7c5cff,#23d5ab);display:grid;place-items:center;font-weight:800;color:#061016;flex-shrink:0}
@@ -132,6 +239,22 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
+
+<!-- Animated Loading Screen -->
+<div id="loader-overlay">
+  <div class="loader-core">
+    <div class="cyber-ring ring1"></div>
+    <div class="cyber-ring ring2"></div>
+    <div class="cyber-ring ring3"></div>
+    <div class="loader-badge">DA</div>
+  </div>
+  <div class="loader-title">GATE DA Command Center</div>
+  <div class="loader-status" id="loaderStatus">Initializing Systems…</div>
+  <div class="loader-progress-track">
+    <div class="loader-progress-bar" id="loaderBar"></div>
+  </div>
+</div>
+
 <div class="app">
 <header class="top">
  <div class="brand">
@@ -796,6 +919,35 @@ function handleImport(e){
   r.readAsText(f);
 }
 
+function startLoadingSequence(){
+  const overlay = $("loader-overlay");
+  const bar = $("loaderBar");
+  const status = $("loaderStatus");
+  if(!overlay) return;
+
+  const steps = [
+    { pct: 25, text: "Verifying Local Storage & Vault…" },
+    { pct: 55, text: "Computing Rank Vectors & IIT Milestones…" },
+    { pct: 85, text: "Calibrating Daily Revision & Streaks…" },
+    { pct: 100, text: "Command Center Online" }
+  ];
+
+  let stepIdx = 0;
+  const interval = setInterval(() => {
+    if(stepIdx < steps.length){
+      const cur = steps[stepIdx];
+      if(bar) bar.style.width = cur.pct + "%";
+      if(status) status.textContent = cur.text;
+      stepIdx++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        overlay.classList.add("fade-out");
+      }, 350);
+    }
+  }, 180);
+}
+
 function init(){
   config=CONFIG;
   const subjSelect=$('subject');
@@ -830,6 +982,7 @@ function init(){
 
   if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   load();
+  startLoadingSequence();
 }
 
 window.addEventListener("DOMContentLoaded", init);
