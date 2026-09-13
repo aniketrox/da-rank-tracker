@@ -12,7 +12,7 @@
 :root{
  --bg:#080b12;--panel:#101621;--panel2:#151c29;--border:#263044;
  --text:#f4f7fb;--muted:#8f9bb0;--accent:#7c5cff;--accent2:#23d5ab;
- --danger:#ff5f6d;--shadow:0 18px 55px rgba(0,0,0,.28);
+ --danger:#ff5f6d;--warning:#f5a623;--shadow:0 18px 55px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 80% 0%,#1a1640 0,#080b12 36%);color:var(--text);font-family:"DM Sans",sans-serif;overflow-x:hidden}
@@ -59,13 +59,29 @@ select:focus,input:focus{border-color:var(--accent)}
 .toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#172131;border:1px solid #344057;box-shadow:var(--shadow);display:none;z-index:9999}
 .empty{color:var(--muted);padding:20px;text-align:center}
 
+/* Revision Section */
+.revision-box{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.revision-card{background:#0d141e;border:1px solid #202a3a;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}
+.revision-card.done{border-color:#23d5ab66;background:linear-gradient(135deg,#0c221e,#0e1a22)}
+.revision-info b{font-size:15px;display:block}
+.revision-info small{color:var(--muted);font-size:12px}
+.rev-btn{border:1px solid #2a384e;background:#131c2a;color:#f4f7fb;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:12px;transition:all .2s}
+.rev-btn.checked{background:#23d5ab;color:#061016;border-color:#23d5ab}
+
 .extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
 .extra-card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
 .extra-card h2{margin:0}.extra-card p{color:var(--muted);font-size:13px;margin:5px 0 16px}
 .stat-row{margin:14px 0}.stat-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.stat-bar{height:9px;background:#20293a;border-radius:99px;overflow:hidden}.stat-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#23d5ab);border-radius:99px;transition:width .25s}
-.reward-current{border:1px solid #413477;background:linear-gradient(135deg,#18133c,#101a24);border-radius:16px;padding:16px;margin-bottom:14px}.reward-current .big{font:700 24px "Space Grotesk";margin:5px 0}.reward-current .small{color:var(--muted);font-size:12px}.reward-list{display:grid;gap:8px;max-height:420px;overflow-y:auto}
-.reward-item{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:11px 12px;border:1px solid #202a3a;border-radius:12px;background:#0d141e}
-.reward-item.unlocked{border-color:#3b6b5f;background:#10221f}.reward-rank{font-family:"Space Grotesk";font-weight:700;font-size:12px}.reward-name{font-weight:700;font-size:14px}.reward-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.reward-current{border:1px solid #413477;background:linear-gradient(135deg,#18133c,#101a24);border-radius:16px;padding:16px;margin-bottom:14px}
+.reward-current .big{font:700 24px "Space Grotesk";margin:5px 0}
+.reward-current .small{color:var(--muted);font-size:12px}
+.reward-list{display:grid;gap:8px;max-height:480px;overflow-y:auto;padding-right:4px}
+.reward-item{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:11px 12px;border:1px solid #202a3a;border-radius:12px;background:#0d141e;transition:all .2s ease}
+.reward-item.unlocked{border-color:#23d5ab55;background:linear-gradient(135deg,#0c221e,#0e1a22)}
+.reward-item.unlocked .reward-rank{color:var(--accent2)}
+.reward-rank{font-family:"Space Grotesk";font-weight:700;font-size:12px;color:var(--muted)}
+.reward-name{font-weight:700;font-size:14px}
+.reward-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* Responsive Media Queries */
 @media(max-width:1050px){
@@ -87,6 +103,7 @@ select:focus,input:focus{border-color:var(--accent)}
  .form{grid-template-columns:1fr;gap:10px}
  .form select, .form input, .form .btn{width:100%}
  .chartbox{height:240px}
+ .revision-box{grid-template-columns:1fr}
  .reward-item{grid-template-columns:95px 1fr}
 }
 @media(max-width:480px){
@@ -115,10 +132,22 @@ select:focus,input:focus{border-color:var(--accent)}
 </header>
 
 <section class="grid">
- <div class="card kpi rank"><div class="label">CURRENT TRAINING RANK</div><div class="value" id="rank">—</div><div class="sub" id="improve">Starting rank 40,000</div></div>
+ <div class="card kpi rank"><div class="label">CURRENT TRAINING RANK</div><div class="value" id="rank">—</div><div class="sub" id="improve">Starting rank 100,000</div></div>
  <div class="card kpi"><div class="label">PROBLEMS SOLVED</div><div class="value" id="total">—</div><div class="sub" id="today">Today: —</div></div>
  <div class="card kpi"><div class="label">WEIGHTED POINTS</div><div class="value" id="points">—</div><div class="sub">Quality × difficulty × subject weight</div></div>
  <div class="card kpi"><div class="label">CONSISTENCY</div><div class="value" id="consistency">—</div><div class="sub" id="active">— active days</div></div>
+
+ <!-- Daily Revision Target Section -->
+ <div class="card panel12">
+  <div class="title-row">
+    <div>
+      <h2>📖 Daily 2-Subject Revision Target</h2>
+      <p>Complete daily revision to keep your earned rank intact. Incomplete revision increases rank by <b>+40</b>.</p>
+    </div>
+    <div class="badge" id="revisionStatusBadge">Today: 0/2 Done</div>
+  </div>
+  <div class="revision-box" id="revisionCards"></div>
+ </div>
 
  <div class="card panel12">
   <div class="title-row"><div><h2>Log today's problems</h2><p>Choose subject, difficulty and quantity. The rank updates automatically.</p></div></div>
@@ -189,18 +218,123 @@ select:focus,input:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data";
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
 const CONFIG={start_date:"2026-08-19",end_date:"2027-01-18",start_rank:100000,subjects:{"Probability & Statistics":17.95,"Programming, DS & Algorithms":15.90,"Machine Learning":14.36,"DBMS & Warehousing":11.28,"Linear Algebra":9.74,"AI":8.72,"Calculus & Optimization":6.67,"General Aptitude":15.38},difficulty:{easy:.75,medium:1,hard:1.35,pyq:1.5}};
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}};
 const entries=()=>read(KEY,[]), save=e=>localStorage.setItem(KEY,JSON.stringify(e)), snaps=()=>read(SNAP,{}), saveSnaps=x=>localStorage.setItem(SNAP,JSON.stringify(x));
+const revData=()=>read(REV_KEY,{}), saveRev=r=>localStorage.setItem(REV_KEY,JSON.stringify(r));
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
 function pointsFor(s,d,q){const ws=Object.values(config.subjects),avg=ws.reduce((a,b)=>a+b,0)/ws.length;return q*(config.subjects[s]/avg)*config.difficulty[d]}
 function rank(points){return Math.max(1,Math.round(config.start_rank-(config.start_rank-1)*(1-Math.exp(-points/2600))))}
 function toast(m){const e=$("toast");e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
-function dashboard(){const es=entries(),t=today(),q=es.reduce((a,x)=>a+ +x.questions,0),p=es.reduce((a,x)=>a+ +x.points,0),te=es.filter(x=>x.entry_date===t),days=new Set(es.map(x=>x.entry_date));let sn=snaps();const st=new Date(config.start_date+"T00:00:00"),now=new Date(t+"T00:00:00"),en=new Date(config.end_date+"T00:00:00"),elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);const missedDays=[];for(let i=0;i<elapsed-1;i++){const d=new Date(st);d.setDate(d.getDate()+i);const ds=localDateKey(d);const dayQuestions=es.filter(x=>x.entry_date===ds).reduce((a,x)=>a+ +x.questions,0);if(dayQuestions<3)missedDays.push(ds)}const penalty=missedDays.length*20;const currentRank=Math.min(config.start_rank,Math.max(1,rank(p)+penalty));sn[t]={rank:currentRank,total_questions:q,points:p};saveSnaps(sn);return{rank:currentRank,improve:config.start_rank-currentRank,q,p,tq:te.reduce((a,x)=>a+ +x.questions,0),active:days.size,consistency:Math.round(1000*days.size/elapsed)/10,missed:missedDays.length,history:Object.entries(sn).sort().map(([date,x])=>({date,...x})),subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))}}
-function load(){const d=dashboard();$("rank").textContent=fmt(d.rank);$("improve").textContent=`${fmt(d.improve)} rank places gained`;$("total").textContent=fmt(d.q);$("today").textContent=`Today: ${fmt(d.tq)} questions`;$("points").textContent=d.p.toFixed(1);$("consistency").textContent=d.consistency+"%";$("active").textContent=d.active+" active days";$("days").textContent=Math.max(0,Math.ceil((new Date(config.end_date)-new Date(today()))/86400000))+" days remaining";renderSubjects(d);renderCharts(d);renderLog();renderHistory()}
+
+function getDailyRevisionPair(dateStr){
+  const subList=Object.keys(CONFIG.subjects);
+  const st=new Date(CONFIG.start_date+"T00:00:00");
+  const target=new Date(dateStr+"T00:00:00");
+  const diffDays=Math.max(0,Math.floor((target-st)/86400000));
+  const idx1=(diffDays*2)%subList.length;
+  const idx2=(diffDays*2+1)%subList.length;
+  return [subList[idx1], subList[idx2]];
+}
+
+function dashboard(){
+  const es=entries(), t=today(), q=es.reduce((a,x)=>a+ +x.questions,0), p=es.reduce((a,x)=>a+ +x.points,0), te=es.filter(x=>x.entry_date===t), days=new Set(es.map(x=>x.entry_date));
+  let sn=snaps();
+  const rd=revData();
+  const st=new Date(config.start_date+"T00:00:00"), now=new Date(t+"T00:00:00"), en=new Date(config.end_date+"T00:00:00");
+  const elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);
+
+  // Check today's revision status
+  const todayRev=rd[t]||{s1:false,s2:false};
+  const todayRevisionDone=Boolean(todayRev.s1 && todayRev.s2);
+
+  // If today's revision is not done, add 40 penalty. If completed, penalty is 0.
+  const revisionPenalty = todayRevisionDone ? 0 : 40;
+
+  const baseRank = rank(p);
+  const currentRank = Math.min(config.start_rank, Math.max(1, baseRank + revisionPenalty));
+  
+  sn[t]={rank:currentRank,total_questions:q,points:p};
+  saveSnaps(sn);
+
+  return{
+    rank:currentRank,
+    improve:config.start_rank-currentRank,
+    q,p,
+    tq:te.reduce((a,x)=>a+ +x.questions,0),
+    active:days.size,
+    consistency:Math.round(1000*days.size/elapsed)/10,
+    todayRevisionDone,
+    history:Object.entries(sn).sort().map(([date,x])=>({date,...x})),
+    subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),
+    diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))
+  };
+}
+
+function renderRevisionBox(){
+  const t=today();
+  const rd=revData();
+  const [s1,s2]=getDailyRevisionPair(t);
+  const todayRev=rd[t]||{s1:false,s2:false};
+
+  const doneCount=(todayRev.s1?1:0)+(todayRev.s2?1:0);
+  $("revisionStatusBadge").textContent=doneCount===2 ? "✓ Revision Complete (Rank Maintained)" : `Today: ${doneCount}/2 Done (+40 Pending Penalty)`;
+  $("revisionStatusBadge").style.borderColor=doneCount===2?"#23d5ab":"#ff5f6d";
+  $("revisionStatusBadge").style.color=doneCount===2?"#23d5ab":"#f4f7fb";
+
+  $("revisionCards").innerHTML=`
+    <div class="revision-card ${todayRev.s1?'done':''}">
+      <div class="revision-info">
+        <small class="muted">SUBJECT 1 TARGET</small>
+        <b>${safe(s1)}</b>
+        <small>${config.subjects[s1]}% GATE Weight</small>
+      </div>
+      <button class="rev-btn ${todayRev.s1?'checked':''}" onclick="toggleRevision('s1')">${todayRev.s1?'✓ Done':'Mark Done'}</button>
+    </div>
+    <div class="revision-card ${todayRev.s2?'done':''}">
+      <div class="revision-info">
+        <small class="muted">SUBJECT 2 TARGET</small>
+        <b>${safe(s2)}</b>
+        <small>${config.subjects[s2]}% GATE Weight</small>
+      </div>
+      <button class="rev-btn ${todayRev.s2?'checked':''}" onclick="toggleRevision('s2')">${todayRev.s2?'✓ Done':'Mark Done'}</button>
+    </div>
+  `;
+}
+
+function toggleRevision(key){
+  const t=today();
+  const rd=revData();
+  if(!rd[t]) rd[t]={s1:false,s2:false};
+  rd[t][key]=!rd[t][key];
+  saveRev(rd);
+  
+  const isAllDone = rd[t].s1 && rd[t].s2;
+  toast(isAllDone ? "Both revised! Rank preserved." : "Revision status updated.");
+  load();
+}
+
+function load(){
+  const d=dashboard();
+  $("rank").textContent=fmt(d.rank);
+  $("improve").textContent=`${fmt(d.improve)} rank places gained`;
+  $("total").textContent=fmt(d.q);
+  $("today").textContent=`Today: ${fmt(d.tq)} questions`;
+  $("points").textContent=d.p.toFixed(1);
+  $("consistency").textContent=d.consistency+"%";
+  $("active").textContent=d.active+" active days";
+  $("days").textContent=Math.max(0,Math.ceil((new Date(config.end_date)-new Date(today()))/86400000))+" days remaining";
+  renderRevisionBox();
+  renderSubjects(d);
+  renderCharts(d);
+  renderLog();
+  renderHistory();
+}
+
 function renderSubjects(d){const max=Math.max(...Object.values(config.subjects));const by=new Map(d.subjects.map(x=>[x.subject,x]));$("subjects").innerHTML=Object.entries(config.subjects).sort((a,b)=>b[1]-a[1]).map(([s,w])=>{const x=by.get(s);return `<div class="subject"><div class="subject-head"><span>${safe(s)}</span><span>${fmt(x.q)} Q · ${x.p.toFixed(1)} pts</span></div><div class="progress"><i style="width:${Math.min(100,w/max*100)}%"></i></div></div>`}).join("")}
 function renderCharts(d){if(rankChart)rankChart.destroy();rankChart=new Chart($("rankChart"),{type:"line",data:{labels:d.history.map(x=>x.date),datasets:[{label:"Training rank",data:d.history.map(x=>x.rank),tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{reverse:true,grid:{color:"#202a3a"}},x:{grid:{display:false}}}}});if(difficultyChart)difficultyChart.destroy();difficultyChart=new Chart($("difficultyChart"),{type:"doughnut",data:{labels:d.diff.filter(x=>x.q).map(x=>x.difficulty.toUpperCase()),datasets:[{data:d.diff.filter(x=>x.q).map(x=>x.q)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#aab4c7"}}}}})}
 function renderLog(){const rows=entries().filter(x=>x.entry_date===today()).sort((a,b)=>b.id-a.id);$("log").innerHTML=rows.length?rows.map(x=>`<tr><td>${safe(x.subject)}</td><td>${x.difficulty.toUpperCase()}</td><td>${x.questions}</td><td>+${(+x.points).toFixed(1)}</td><td><button class="btn danger" style="padding:6px 9px" onclick="removeEntry(${x.id})">×</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">No problems recorded today.</td></tr>`}
@@ -209,9 +343,9 @@ function showHistory(d){const rows=entries().filter(x=>x.entry_date===d).sort((a
 function closeHistoryDetails(){$("historyDetails").style.display="none"}
 function addEntry(){const q=+$('questions').value;if(!q||q<1){toast("Enter the number of problems.");return}const es=entries(),todayQuestions=es.filter(x=>x.entry_date===today()).reduce((a,x)=>a+ +x.questions,0);if(todayQuestions+q<3){toast(`You must solve at least 3 problems today. Add ${3-todayQuestions} more.`);return}const e={id:Date.now(),entry_date:today(),subject:$('subject').value,difficulty:$('difficulty').value,questions:q,points:pointsFor($('subject').value,$('difficulty').value,q),created_at:new Date().toISOString()};es.push(e);save(es);$('questions').value="";const d=dashboard();toast(`Added. Rank → ${fmt(d.rank)}`);load()}
 function removeEntry(id){if(!confirm("Delete this entry?"))return;save(entries().filter(x=>x.id!==id));closeHistoryDetails();toast("Entry deleted.");load()}
-function exportData(){const b=new Blob([JSON.stringify({version:1,exported_at:new Date().toISOString(),entries:entries(),snapshots:snaps()},null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="gate-da-tracker-backup.json";a.click();URL.revokeObjectURL(u);toast("Backup exported.")}
+function exportData(){const b=new Blob([JSON.stringify({version:1,exported_at:new Date().toISOString(),entries:entries(),snapshots:snaps(),revision:revData()},null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="gate-da-tracker-backup.json";a.click();URL.revokeObjectURL(u);toast("Backup exported.")}
 function importData(){$("importFile").click()}
-function handleImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.entries))throw Error("Invalid backup file.");save(x.entries);if(x.snapshots)saveSnaps(x.snapshots);load();toast("Backup restored successfully.")}catch(err){toast(err.message)}e.target.value=""};r.readAsText(f)}
+function handleImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.entries))throw Error("Invalid backup file.");save(x.entries);if(x.snapshots)saveSnaps(x.snapshots);if(x.revision)saveRev(x.revision);load();toast("Backup restored successfully.")}catch(err){toast(err.message)}e.target.value=""};r.readAsText(f)}
 function init(){config=CONFIG;for(const[s,w]of Object.entries(config.subjects)){const o=document.createElement("option");o.value=s;o.textContent=`${s} · ${w.toFixed(2)}%`;$('subject').appendChild(o)}for(const[d,m]of Object.entries(config.difficulty)){const o=document.createElement("option");o.value=d;o.textContent=`${d.toUpperCase()} · ×${m}`;$('difficulty').appendChild(o)}$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});load()}
 init();
 </script>
@@ -221,26 +355,26 @@ const IIT_REWARDS=[
  {rank:75000,name:"IIT Bhilai",tier:"Foundation IIT Target"},
  {rank:63000,name:"IIT Goa",tier:"Foundation IIT Target"},
  {rank:51000,name:"IIT Dharwad",tier:"Foundation IIT Target"},
- {rank:39000,name:"IIT Jammu",tier:"Rising IIT Target"},
- {rank:27000,name:"IIT Palakkad",tier:"Rising IIT Target"},
- {rank:15000,name:"IIT Tirupati",tier:"Strong IIT Target"},
- {rank:3000,name:"IIT Bhubaneswar",tier:"Strong IIT Target"},
- {rank:3000,name:"IIT Jodhpur",tier:"Strong IIT Target"},
- {rank:3000,name:"IIT Mandi",tier:"Strong IIT Target"},
- {rank:3000,name:"IIT Ropar",tier:"Strong IIT Target"},
- {rank:3000,name:"IIT Indore",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT Patna",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT Gandhinagar",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT Hyderabad",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT (BHU) Varanasi",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT (ISM) Dhanbad",tier:"Elite IIT Target"},
- {rank:3000,name:"IIT Guwahati",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Roorkee",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Kanpur",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Kharagpur",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Delhi",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Bombay",tier:"Top IIT Target"},
- {rank:3000,name:"IIT Madras",tier:"Top IIT Target"}
+ {rank:40000,name:"IIT Jammu",tier:"Rising IIT Target"},
+ {rank:32000,name:"IIT Palakkad",tier:"Rising IIT Target"},
+ {rank:25000,name:"IIT Tirupati",tier:"Rising IIT Target"},
+ {rank:18000,name:"IIT Bhubaneswar",tier:"Emerging Tier-2 Target"},
+ {rank:14000,name:"IIT Jodhpur",tier:"Emerging Tier-2 Target"},
+ {rank:10000,name:"IIT Mandi",tier:"Emerging Tier-2 Target"},
+ {rank:7500, name:"IIT Ropar",tier:"Strong Gen-2 Target"},
+ {rank:5500, name:"IIT Patna",tier:"Strong Gen-2 Target"},
+ {rank:4000, name:"IIT Gandhinagar",tier:"Prime Gen-2 Target"},
+ {rank:3000, name:"IIT (ISM) Dhanbad",tier:"Prime Gen-2 Target"},
+ {rank:2200, name:"IIT (BHU) Varanasi",tier:"Heritage Tech Target"},
+ {rank:1500, name:"IIT Indore",tier:"Elite Gen-2 Target"},
+ {rank:1000, name:"IIT Hyderabad",tier:"Top AI/Data Hub Target"},
+ {rank:750,  name:"IIT Guwahati",tier:"Top-7 IIT Target"},
+ {rank:550,  name:"IIT Roorkee",tier:"Top-7 IIT Target"},
+ {rank:400,  name:"IIT Kharagpur",tier:"Top-7 IIT Target"},
+ {rank:300,  name:"IIT Kanpur",tier:"Premier Research Target"},
+ {rank:220,  name:"IIT Delhi",tier:"Top Tier Apex Target"},
+ {rank:180,  name:"IIT Madras",tier:"Top Tier Apex Target"},
+ {rank:150,  name:"IIT Bombay",tier:"Apex Milestone Target"}
 ];
 
 function renderSubjectTotals(){
@@ -264,26 +398,57 @@ function renderSubjectTotals(){
 
 function renderIITRewards(){
   const current=Number($("rank").textContent.replace(/,/g,""));
-  const sorted=IIT_REWARDS.slice().sort((a,b)=>a.rank-b.rank);
-  const unlocked=sorted.filter(x=>current<=x.rank);
+  const sortedAsc=[...IIT_REWARDS].sort((a,b)=>a.rank-b.rank);
+  const sortedDesc=[...IIT_REWARDS].sort((a,b)=>b.rank-a.rank);
+  
+  const unlocked=sortedAsc.filter(x=>current<=x.rank);
   const best=unlocked[0] || null;
-  let next=sorted.slice().sort((a,b)=>b.rank-a.rank).find(x=>current>x.rank);
-  if(!next && current>sorted[0].rank) next=sorted[0];
+  const nextTarget=sortedDesc.find(x=>current>x.rank) || null;
 
-  const topTag = $("topIitTag");
+  const topTag=$("topIitTag");
   if(best){
-    const gap=Math.max(0,current-best.rank);
-    if(topTag) topTag.innerHTML = `🎯 Unlocked: <b>${safe(best.name)}</b>`;
-    $("rewardCurrent").innerHTML=`<div class="reward-current"><div class="small">CURRENT BEST UNLOCKED REWARD</div><div class="big">${best.name}</div><div>${best.tier}</div><div class="small">Reward threshold: rank ${fmt(best.rank)} · Your training rank: ${fmt(current)}${gap?` · ${fmt(gap)} ranks to improve`:" · Unlocked!"}</div></div>`;
-  }else{
-    const first=sorted[0];
-    if(topTag) topTag.innerHTML = `🎯 Target: <b>${safe(first.name)}</b> (≤${fmt(first.rank)})`;
-    $("rewardCurrent").innerHTML=`<div class="reward-current"><div class="small">NEXT IIT REWARD</div><div class="big">${first.name}</div><div>${first.tier}</div><div class="small">Reach training rank ${fmt(first.rank)} or better.</div></div>`;
+    if(topTag) topTag.innerHTML=`🎯 Unlocked: <b>${safe(best.name)}</b>`;
+  }else if(nextTarget){
+    if(topTag) topTag.innerHTML=`🎯 Next: <b>${safe(nextTarget.name)}</b> (≤${fmt(nextTarget.rank)})`;
   }
 
-  $("rewardList").innerHTML=IIT_REWARDS.slice().sort((a,b)=>b.rank-a.rank).map((x,i)=>{
+  if(best){
+    const nextBetter=[...sortedDesc].reverse().find(x=>x.rank<best.rank);
+    const gap=nextBetter?current-nextBetter.rank:0;
+    $("rewardCurrent").innerHTML=`
+      <div class="reward-current">
+        <div class="small">CURRENT BEST UNLOCKED MILESTONE</div>
+        <div class="big">${safe(best.name)}</div>
+        <div style="color:var(--accent2);font-weight:600;font-size:13px">${safe(best.tier)}</div>
+        <div class="small" style="margin-top:8px">
+          Training Rank: <b>${fmt(current)}</b> · Unlocked at: ≤ ${fmt(best.rank)}
+          ${nextBetter?`<br><span style="color:#b9c3d4">Next Goal: <b>${safe(nextBetter.name)}</b> (Rank ≤ ${fmt(nextBetter.rank)}) · <b>${fmt(gap)}</b> places to go</span>`:""}
+        </div>
+      </div>`;
+  }else{
+    const target=nextTarget||sortedDesc[0];
+    const gap=current-target.rank;
+    $("rewardCurrent").innerHTML=`
+      <div class="reward-current">
+        <div class="small">NEXT MILESTONE TARGET</div>
+        <div class="big">${safe(target.name)}</div>
+        <div style="color:var(--warning);font-weight:600;font-size:13px">${safe(target.tier)}</div>
+        <div class="small" style="margin-top:8px">
+          Current Rank: <b>${fmt(current)}</b> · Target: ≤ <b>${fmt(target.rank)}</b> (<b>${fmt(gap)}</b> places to reduce)
+        </div>
+      </div>`;
+  }
+
+  $("rewardList").innerHTML=sortedDesc.map(x=>{
     const isUnlocked=current<=x.rank;
-    return `<div class="reward-item ${isUnlocked?"unlocked":""}"><div class="reward-rank">${isUnlocked?"✓":"🔒"} ≤ ${fmt(x.rank)}</div><div><div class="reward-name">${safe(x.name)}</div><div class="reward-sub">${safe(x.tier)} · ${isUnlocked?"Unlocked":"Keep pushing"}</div></div></div>`;
+    return `
+      <div class="reward-item ${isUnlocked?"unlocked":""}">
+        <div class="reward-rank">${isUnlocked?"✓":"🔒"} ≤ ${fmt(x.rank)}</div>
+        <div>
+          <div class="reward-name">${safe(x.name)}</div>
+          <div class="reward-sub">${safe(x.tier)} · ${isUnlocked?"<span style='color:var(--accent2)'>Unlocked</span>":"Locked"}</div>
+        </div>
+      </div>`;
   }).join("");
 }
 
