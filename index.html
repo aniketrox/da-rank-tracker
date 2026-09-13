@@ -12,12 +12,12 @@
 :root{
  --bg:#080b12;--panel:#101621;--panel2:#151c29;--border:#263044;
  --text:#f4f7fb;--muted:#8f9bb0;--accent:#7c5cff;--accent2:#23d5ab;
- --danger:#ff5f6d;--warning:#f5a623;--shadow:0 18px 55px rgba(0,0,0,.28);
+ --danger:#ff5f6d;--warning:#f5a623;--freeze:#38bdf8;--shadow:0 18px 55px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 80% 0%,#1a1640 0,#080b12 36%);color:var(--text);font-family:"DM Sans",sans-serif;overflow-x:hidden}
 h1,h2,h3{font-family:"Space Grotesk",sans-serif;margin:0}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 .app{max-width:1450px;margin:auto;padding:24px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
@@ -28,6 +28,8 @@ button,input,select{font:inherit}
 .badge{border:1px solid var(--border);background:#101621aa;padding:10px 14px;border-radius:12px;color:#b9c3d4;font-size:13px}
 .badge.iit-badge{border-color:#413477;background:linear-gradient(135deg,#18133caa,#101a24aa);color:#f4f7fb;font-weight:600}
 .badge.iit-badge b{color:var(--accent2)}
+.badge.streak-badge{border-color:#e67e22;background:linear-gradient(135deg,#2e1708aa,#19120caa);color:#ffbe76;font-weight:700}
+.badge.freeze-badge{border-color:#0284c7;background:linear-gradient(135deg,#0c2333aa,#0d1822aa);color:#bae6fd;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 .card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
 .kpi{grid-column:span 3;min-height:135px}
@@ -36,16 +38,19 @@ button,input,select{font:inherit}
 .kpi .sub{font-size:13px;color:#9faabe}
 .rank{background:linear-gradient(135deg,#18133c,#101a24);border-color:#413477}
 .rank .value{font-size:45px}
+.streak-kpi{background:linear-gradient(135deg,#24140a,#15111b);border-color:#63340f}
+.streak-kpi .value{color:#ffbe76}
 .panel6{grid-column:span 6}.panel8{grid-column:span 8}.panel4{grid-column:span 4}.panel12{grid-column:span 12}
 .title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px;flex-wrap:wrap}
 .title-row p{color:var(--muted);font-size:13px;margin:5px 0 0}
 .form{display:grid;grid-template-columns:1.4fr 1fr .7fr auto;gap:10px}
-select,input{width:100%;background:#0a0f18;color:var(--text);border:1px solid #2a3447;border-radius:12px;padding:12px 13px;outline:none}
-select:focus,input:focus{border-color:var(--accent)}
+select,input,textarea{width:100%;background:#0a0f18;color:var(--text);border:1px solid #2a3447;border-radius:12px;padding:12px 13px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;white-space:nowrap;transition:filter .2s}
 .btn:hover{filter:brightness(1.1)}
 .btn.secondary{background:#1a2332;border:1px solid #2b364a}
 .btn.danger{background:#29141a;color:#ff9aa2}
+.btn.freeze-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:#f0f9ff}
 .chartbox{height:290px;position:relative}
 .table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table{width:100%;min-width:480px;border-collapse:collapse}
@@ -68,6 +73,15 @@ select:focus,input:focus{border-color:var(--accent)}
 .rev-btn{border:1px solid #2a384e;background:#131c2a;color:#f4f7fb;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:12px;transition:all .2s}
 .rev-btn.checked{background:#23d5ab;color:#061016;border-color:#23d5ab}
 
+/* Mistake Notebook & Accuracy Styles */
+.error-form{display:grid;grid-template-columns:1.2fr 1fr 1.6fr 1.6fr auto;gap:10px;margin-bottom:18px}
+.tag-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.tag-calc{background:#381e1e;color:#ff9aa2;border:1px solid #5a2626}
+.tag-concept{background:#1e2438;color:#8ab4f8;border:1px solid #28395e}
+.tag-formula{background:#3a2f16;color:#fdd663;border:1px solid #5e4a1d}
+.tag-misread{background:#2b1d38;color:#d7aefb;border:1px solid #4a286a}
+.tag-time{background:#1d332d;color:#81c995;border:1px solid #285444}
+
 .extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
 .extra-card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
 .extra-card h2{margin:0}.extra-card p{color:var(--muted);font-size:13px;margin:5px 0 16px}
@@ -88,6 +102,7 @@ select:focus,input:focus{border-color:var(--accent)}
  .kpi{grid-column:span 6}
  .panel8,.panel4,.panel6{grid-column:span 12}
  .extra-grid{grid-template-columns:1fr}
+ .error-form{grid-template-columns:1fr 1fr}
 }
 @media(max-width:768px){
  .app{padding:14px}
@@ -101,7 +116,8 @@ select:focus,input:focus{border-color:var(--accent)}
  .kpi .value{font-size:32px}
  .rank .value{font-size:38px}
  .form{grid-template-columns:1fr;gap:10px}
- .form select, .form input, .form .btn{width:100%}
+ .error-form{grid-template-columns:1fr}
+ .form select, .form input, .form .btn, .error-form select, .error-form input, .error-form .btn{width:100%}
  .chartbox{height:240px}
  .revision-box{grid-template-columns:1fr}
  .reward-item{grid-template-columns:95px 1fr}
@@ -123,6 +139,9 @@ select:focus,input:focus{border-color:var(--accent)}
   <div><h1>Problem Solving Command Center</h1><small>GATE DA 2027 · 19 Aug 2026 → 18 Jan 2027</small></div>
  </div>
  <div class="top-actions">
+  <div class="badge streak-badge" id="topStreakTag">🔥 Streak: 0 Days</div>
+  <div class="badge freeze-badge" id="topFreezeTag">🧊 Freezes: 2/2</div>
+  <button class="btn freeze-btn" id="useFreezeBtn" onclick="toggleStreakFreezeToday()">🧊 Use Freeze Today</button>
   <div class="badge iit-badge" id="topIitTag">🎯 IIT: Loading…</div>
   <div class="badge" id="days">Loading…</div>
   <button class="btn secondary" onclick="exportData()">Export Data</button>
@@ -133,16 +152,16 @@ select:focus,input:focus{border-color:var(--accent)}
 
 <section class="grid">
  <div class="card kpi rank"><div class="label">CURRENT TRAINING RANK</div><div class="value" id="rank">—</div><div class="sub" id="improve">Starting rank 100,000</div></div>
+ <div class="card kpi streak-kpi"><div class="label">ACTIVE STREAK</div><div class="value" id="streakVal">0 Days</div><div class="sub" id="streakSub">Min 3 Qs + Revision or Freeze</div></div>
+ <div class="card kpi"><div class="label">ACCURACY RATE</div><div class="value" id="accuracyVal">—%</div><div class="sub" id="accuracySub">0 recorded errors</div></div>
  <div class="card kpi"><div class="label">PROBLEMS SOLVED</div><div class="value" id="total">—</div><div class="sub" id="today">Today: —</div></div>
- <div class="card kpi"><div class="label">WEIGHTED POINTS</div><div class="value" id="points">—</div><div class="sub">Quality × difficulty × subject weight</div></div>
- <div class="card kpi"><div class="label">CONSISTENCY</div><div class="value" id="consistency">—</div><div class="sub" id="active">— active days</div></div>
 
  <!-- Daily Revision Target Section -->
  <div class="card panel12">
   <div class="title-row">
     <div>
       <h2>📖 Daily 2-Subject Revision Target</h2>
-      <p>Complete daily revision to keep your earned rank intact. Incomplete revision increases rank by <b>+40</b>.</p>
+      <p>Complete daily revision to keep your earned rank intact. Incomplete revision increases rank by <b>+40</b> (unless protected by a Streak Freeze).</p>
     </div>
     <div class="badge" id="revisionStatusBadge">Today: 0/2 Done</div>
   </div>
@@ -156,6 +175,46 @@ select:focus,input:focus{border-color:var(--accent)}
    <select id="difficulty"></select>
    <input id="questions" type="number" min="1" placeholder="Problems">
    <button class="btn" onclick="addEntry()">+ Add problems</button>
+  </div>
+ </div>
+
+ <!-- Accuracy & Mistake Notebook Card -->
+ <div class="card panel12">
+  <div class="title-row">
+    <div>
+      <h2>📓 Mistake Notebook & Error Tracker</h2>
+      <p>Log tricky questions, concept traps, and calculation slips to stop repeating errors.</p>
+    </div>
+    <div class="badge" id="errorCountBadge">0 Total Mistakes Logged</div>
+  </div>
+  <div class="error-form">
+   <select id="errSubject"></select>
+   <select id="errType">
+     <option value="Calculation Slip">Calculation Slip</option>
+     <option value="Concept Gap">Concept Gap</option>
+     <option value="Formula Forgot">Formula Forgot / Misapplied</option>
+     <option value="Question Misread">Question Misread / Trick Trap</option>
+     <option value="Time Pressure">Time Pressure / Guess</option>
+   </select>
+   <input id="errQuestion" type="text" placeholder="Question / Concept summary">
+   <input id="errTakeaway" type="text" placeholder="Key takeaway / Correct approach">
+   <button class="btn" onclick="addMistakeEntry()">+ Log Mistake</button>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Subject</th>
+          <th>Type of Error</th>
+          <th>Question / Issue</th>
+          <th>Key Takeaway / Fix</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="mistakeLog"></tbody>
+    </table>
   </div>
  </div>
 
@@ -218,139 +277,21 @@ select:focus,input:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data";
+const MAX_FREEZES_PER_MONTH = 2;
+
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
 const CONFIG={start_date:"2026-08-19",end_date:"2027-01-18",start_rank:100000,subjects:{"Probability & Statistics":17.95,"Programming, DS & Algorithms":15.90,"Machine Learning":14.36,"DBMS & Warehousing":11.28,"Linear Algebra":9.74,"AI":8.72,"Calculus & Optimization":6.67,"General Aptitude":15.38},difficulty:{easy:.75,medium:1,hard:1.35,pyq:1.5}};
+
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}};
 const entries=()=>read(KEY,[]), save=e=>localStorage.setItem(KEY,JSON.stringify(e)), snaps=()=>read(SNAP,{}), saveSnaps=x=>localStorage.setItem(SNAP,JSON.stringify(x));
 const revData=()=>read(REV_KEY,{}), saveRev=r=>localStorage.setItem(REV_KEY,JSON.stringify(r));
+const mistakesData=()=>read(ERR_KEY,[]), saveMistakes=m=>localStorage.setItem(ERR_KEY,JSON.stringify(m));
+const freezeData=()=>read(FREEZE_KEY,[]), saveFreezes=f=>localStorage.setItem(FREEZE_KEY,JSON.stringify(f));
+
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 
-function pointsFor(s,d,q){const ws=Object.values(config.subjects),avg=ws.reduce((a,b)=>a+b,0)/ws.length;return q*(config.subjects[s]/avg)*config.difficulty[d]}
-function rank(points){return Math.max(1,Math.round(config.start_rank-(config.start_rank-1)*(1-Math.exp(-points/2600))))}
-function toast(m){const e=$("toast");e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
-
-function getDailyRevisionPair(dateStr){
-  const subList=Object.keys(CONFIG.subjects);
-  const st=new Date(CONFIG.start_date+"T00:00:00");
-  const target=new Date(dateStr+"T00:00:00");
-  const diffDays=Math.max(0,Math.floor((target-st)/86400000));
-  const idx1=(diffDays*2)%subList.length;
-  const idx2=(diffDays*2+1)%subList.length;
-  return [subList[idx1], subList[idx2]];
-}
-
-function dashboard(){
-  const es=entries(), t=today(), q=es.reduce((a,x)=>a+ +x.questions,0), p=es.reduce((a,x)=>a+ +x.points,0), te=es.filter(x=>x.entry_date===t), days=new Set(es.map(x=>x.entry_date));
-  let sn=snaps();
-  const rd=revData();
-  const st=new Date(config.start_date+"T00:00:00"), now=new Date(t+"T00:00:00"), en=new Date(config.end_date+"T00:00:00");
-  const elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);
-
-  // Check today's revision status
-  const todayRev=rd[t]||{s1:false,s2:false};
-  const todayRevisionDone=Boolean(todayRev.s1 && todayRev.s2);
-
-  // If today's revision is not done, add 40 penalty. If completed, penalty is 0.
-  const revisionPenalty = todayRevisionDone ? 0 : 40;
-
-  const baseRank = rank(p);
-  const currentRank = Math.min(config.start_rank, Math.max(1, baseRank + revisionPenalty));
-  
-  sn[t]={rank:currentRank,total_questions:q,points:p};
-  saveSnaps(sn);
-
-  return{
-    rank:currentRank,
-    improve:config.start_rank-currentRank,
-    q,p,
-    tq:te.reduce((a,x)=>a+ +x.questions,0),
-    active:days.size,
-    consistency:Math.round(1000*days.size/elapsed)/10,
-    todayRevisionDone,
-    history:Object.entries(sn).sort().map(([date,x])=>({date,...x})),
-    subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),
-    diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))
-  };
-}
-
-function renderRevisionBox(){
-  const t=today();
-  const rd=revData();
-  const [s1,s2]=getDailyRevisionPair(t);
-  const todayRev=rd[t]||{s1:false,s2:false};
-
-  const doneCount=(todayRev.s1?1:0)+(todayRev.s2?1:0);
-  $("revisionStatusBadge").textContent=doneCount===2 ? "✓ Revision Complete (Rank Maintained)" : `Today: ${doneCount}/2 Done (+40 Pending Penalty)`;
-  $("revisionStatusBadge").style.borderColor=doneCount===2?"#23d5ab":"#ff5f6d";
-  $("revisionStatusBadge").style.color=doneCount===2?"#23d5ab":"#f4f7fb";
-
-  $("revisionCards").innerHTML=`
-    <div class="revision-card ${todayRev.s1?'done':''}">
-      <div class="revision-info">
-        <small class="muted">SUBJECT 1 TARGET</small>
-        <b>${safe(s1)}</b>
-        <small>${config.subjects[s1]}% GATE Weight</small>
-      </div>
-      <button class="rev-btn ${todayRev.s1?'checked':''}" onclick="toggleRevision('s1')">${todayRev.s1?'✓ Done':'Mark Done'}</button>
-    </div>
-    <div class="revision-card ${todayRev.s2?'done':''}">
-      <div class="revision-info">
-        <small class="muted">SUBJECT 2 TARGET</small>
-        <b>${safe(s2)}</b>
-        <small>${config.subjects[s2]}% GATE Weight</small>
-      </div>
-      <button class="rev-btn ${todayRev.s2?'checked':''}" onclick="toggleRevision('s2')">${todayRev.s2?'✓ Done':'Mark Done'}</button>
-    </div>
-  `;
-}
-
-function toggleRevision(key){
-  const t=today();
-  const rd=revData();
-  if(!rd[t]) rd[t]={s1:false,s2:false};
-  rd[t][key]=!rd[t][key];
-  saveRev(rd);
-  
-  const isAllDone = rd[t].s1 && rd[t].s2;
-  toast(isAllDone ? "Both revised! Rank preserved." : "Revision status updated.");
-  load();
-}
-
-function load(){
-  const d=dashboard();
-  $("rank").textContent=fmt(d.rank);
-  $("improve").textContent=`${fmt(d.improve)} rank places gained`;
-  $("total").textContent=fmt(d.q);
-  $("today").textContent=`Today: ${fmt(d.tq)} questions`;
-  $("points").textContent=d.p.toFixed(1);
-  $("consistency").textContent=d.consistency+"%";
-  $("active").textContent=d.active+" active days";
-  $("days").textContent=Math.max(0,Math.ceil((new Date(config.end_date)-new Date(today()))/86400000))+" days remaining";
-  renderRevisionBox();
-  renderSubjects(d);
-  renderCharts(d);
-  renderLog();
-  renderHistory();
-}
-
-function renderSubjects(d){const max=Math.max(...Object.values(config.subjects));const by=new Map(d.subjects.map(x=>[x.subject,x]));$("subjects").innerHTML=Object.entries(config.subjects).sort((a,b)=>b[1]-a[1]).map(([s,w])=>{const x=by.get(s);return `<div class="subject"><div class="subject-head"><span>${safe(s)}</span><span>${fmt(x.q)} Q · ${x.p.toFixed(1)} pts</span></div><div class="progress"><i style="width:${Math.min(100,w/max*100)}%"></i></div></div>`}).join("")}
-function renderCharts(d){if(rankChart)rankChart.destroy();rankChart=new Chart($("rankChart"),{type:"line",data:{labels:d.history.map(x=>x.date),datasets:[{label:"Training rank",data:d.history.map(x=>x.rank),tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{reverse:true,grid:{color:"#202a3a"}},x:{grid:{display:false}}}}});if(difficultyChart)difficultyChart.destroy();difficultyChart=new Chart($("difficultyChart"),{type:"doughnut",data:{labels:d.diff.filter(x=>x.q).map(x=>x.difficulty.toUpperCase()),datasets:[{data:d.diff.filter(x=>x.q).map(x=>x.q)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#aab4c7"}}}}})}
-function renderLog(){const rows=entries().filter(x=>x.entry_date===today()).sort((a,b)=>b.id-a.id);$("log").innerHTML=rows.length?rows.map(x=>`<tr><td>${safe(x.subject)}</td><td>${x.difficulty.toUpperCase()}</td><td>${x.questions}</td><td>+${(+x.points).toFixed(1)}</td><td><button class="btn danger" style="padding:6px 9px" onclick="removeEntry(${x.id})">×</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">No problems recorded today.</td></tr>`}
-function renderHistory(){const g={};entries().forEach(x=>{g[x.entry_date]??={q:0,p:0,n:0};g[x.entry_date].q+=+x.questions;g[x.entry_date].p+=+x.points;g[x.entry_date].n++});const ds=Object.keys(g).sort().reverse();$("historyLog").innerHTML=ds.length?ds.map(d=>`<tr><td>${label(d)}</td><td>${fmt(g[d].q)}</td><td>${g[d].p.toFixed(1)}</td><td>${g[d].n}</td><td><button class="btn secondary" style="padding:6px 10px" onclick="showHistory('${d}')">View</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">No study history yet.</td></tr>`}
-function showHistory(d){const rows=entries().filter(x=>x.entry_date===d).sort((a,b)=>b.id-a.id);$("historyTitle").textContent=label(d)+" — Details";$("historyDetailLog").innerHTML=rows.map(x=>`<tr><td>${safe(x.subject)}</td><td>${x.difficulty.toUpperCase()}</td><td>${x.questions}</td><td>+${(+x.points).toFixed(1)}</td><td><button class="btn danger" style="padding:6px 9px" onclick="removeEntry(${x.id})">×</button></td></tr>`).join("");$("historyDetails").style.display="block";$("historyDetails").scrollIntoView({behavior:"smooth"})}
-function closeHistoryDetails(){$("historyDetails").style.display="none"}
-function addEntry(){const q=+$('questions').value;if(!q||q<1){toast("Enter the number of problems.");return}const es=entries(),todayQuestions=es.filter(x=>x.entry_date===today()).reduce((a,x)=>a+ +x.questions,0);if(todayQuestions+q<3){toast(`You must solve at least 3 problems today. Add ${3-todayQuestions} more.`);return}const e={id:Date.now(),entry_date:today(),subject:$('subject').value,difficulty:$('difficulty').value,questions:q,points:pointsFor($('subject').value,$('difficulty').value,q),created_at:new Date().toISOString()};es.push(e);save(es);$('questions').value="";const d=dashboard();toast(`Added. Rank → ${fmt(d.rank)}`);load()}
-function removeEntry(id){if(!confirm("Delete this entry?"))return;save(entries().filter(x=>x.id!==id));closeHistoryDetails();toast("Entry deleted.");load()}
-function exportData(){const b=new Blob([JSON.stringify({version:1,exported_at:new Date().toISOString(),entries:entries(),snapshots:snaps(),revision:revData()},null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="gate-da-tracker-backup.json";a.click();URL.revokeObjectURL(u);toast("Backup exported.")}
-function importData(){$("importFile").click()}
-function handleImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.entries))throw Error("Invalid backup file.");save(x.entries);if(x.snapshots)saveSnaps(x.snapshots);if(x.revision)saveRev(x.revision);load();toast("Backup restored successfully.")}catch(err){toast(err.message)}e.target.value=""};r.readAsText(f)}
-function init(){config=CONFIG;for(const[s,w]of Object.entries(config.subjects)){const o=document.createElement("option");o.value=s;o.textContent=`${s} · ${w.toFixed(2)}%`;$('subject').appendChild(o)}for(const[d,m]of Object.entries(config.difficulty)){const o=document.createElement("option");o.value=d;o.textContent=`${d.toUpperCase()} · ×${m}`;$('difficulty').appendChild(o)}$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});load()}
-init();
-</script>
-
-<script id="added-features-script">
 const IIT_REWARDS=[
  {rank:75000,name:"IIT Bhilai",tier:"Foundation IIT Target"},
  {rank:63000,name:"IIT Goa",tier:"Foundation IIT Target"},
@@ -377,6 +318,253 @@ const IIT_REWARDS=[
  {rank:150,  name:"IIT Bombay",tier:"Apex Milestone Target"}
 ];
 
+function pointsFor(s,d,q){const ws=Object.values(config.subjects),avg=ws.reduce((a,b)=>a+b,0)/ws.length;return q*(config.subjects[s]/avg)*config.difficulty[d]}
+function rank(points){return Math.max(1,Math.round(config.start_rank-(config.start_rank-1)*(1-Math.exp(-points/2600))))}
+function toast(m){const e=$("toast");if(!e)return;e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
+
+function getDailyRevisionPair(dateStr){
+  const subList=Object.keys(CONFIG.subjects);
+  const st=new Date(CONFIG.start_date+"T00:00:00");
+  const target=new Date(dateStr+"T00:00:00");
+  const diffDays=Math.max(0,Math.floor((target-st)/86400000));
+  const idx1=(diffDays*2)%subList.length;
+  const idx2=(diffDays*2+1)%subList.length;
+  return [subList[idx1], subList[idx2]];
+}
+
+function calculateStreakAndFreezes(){
+  const t=today();
+  const es=entries();
+  const rd=revData();
+  const freezes=freezeData();
+  
+  const curMonthKey=t.slice(0,7);
+  const usedThisMonth=freezes.filter(d=>d.startsWith(curMonthKey)).length;
+  const availableFreezes=Math.max(0, MAX_FREEZES_PER_MONTH - usedThisMonth);
+
+  const isDateSatisfied=dateStr=>{
+    if(freezes.includes(dateStr)) return true;
+    const dayQs=es.filter(x=>x.entry_date===dateStr).reduce((a,b)=>a+ +b.questions,0);
+    const dayRev=rd[dateStr];
+    const revDone=Boolean(dayRev && dayRev.s1 && dayRev.s2);
+    return dayQs >= 3 && revDone;
+  };
+
+  let streak=0;
+  let cur=new Date(t+"T00:00:00");
+  
+  if(isDateSatisfied(t)){
+    streak++;
+    cur.setDate(cur.getDate()-1);
+  } else {
+    cur.setDate(cur.getDate()-1);
+  }
+
+  while(true){
+    const dStr=localDateKey(cur);
+    if(dStr < CONFIG.start_date) break;
+    if(isDateSatisfied(dStr)){
+      streak++;
+      cur.setDate(cur.getDate()-1);
+    } else {
+      break;
+    }
+  }
+
+  return { streak, availableFreezes, isTodayFrozen: freezes.includes(t) };
+}
+
+function toggleStreakFreezeToday(){
+  const t=today();
+  let freezes=freezeData();
+  const curMonthKey=t.slice(0,7);
+  const usedThisMonth=freezes.filter(d=>d.startsWith(curMonthKey)).length;
+
+  if(freezes.includes(t)){
+    freezes=freezes.filter(d=>d!==t);
+    saveFreezes(freezes);
+    toast("Streak freeze revoked for today.");
+  } else {
+    if(usedThisMonth >= MAX_FREEZES_PER_MONTH){
+      toast(`Monthly freeze limit (${MAX_FREEZES_PER_MONTH}) reached for this month!`);
+      return;
+    }
+    freezes.push(t);
+    saveFreezes(freezes);
+    toast("🧊 Streak freeze activated for today! Rank and streak protected.");
+  }
+  load();
+}
+
+function dashboard(){
+  const es=entries(), t=today(), q=es.reduce((a,x)=>a+ +x.questions,0), p=es.reduce((a,x)=>a+ +x.points,0), te=es.filter(x=>x.entry_date===t), days=new Set(es.map(x=>x.entry_date));
+  let sn=snaps();
+  const rd=revData();
+  const mList=mistakesData();
+  const freezes=freezeData();
+  const st=new Date(config.start_date+"T00:00:00"), now=new Date(t+"T00:00:00"), en=new Date(config.end_date+"T00:00:00");
+  const elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);
+
+  const isFrozenToday=freezes.includes(t);
+  const todayRev=rd[t]||{s1:false,s2:false};
+  const todayRevisionDone=Boolean(todayRev.s1 && todayRev.s2);
+
+  const revisionPenalty=(todayRevisionDone || isFrozenToday) ? 0 : 40;
+  const baseRank=rank(p);
+  const currentRank=Math.min(config.start_rank, Math.max(1, baseRank + revisionPenalty));
+  
+  sn[t]={rank:currentRank,total_questions:q,points:p};
+  saveSnaps(sn);
+
+  const totalAttempts=q + mList.length;
+  const accuracyPct=totalAttempts > 0 ? ((q / totalAttempts) * 100).toFixed(1) : "100.0";
+  const streakInfo=calculateStreakAndFreezes();
+
+  return{
+    rank:currentRank,
+    improve:config.start_rank-currentRank,
+    q,p,
+    tq:te.reduce((a,x)=>a+ +x.questions,0),
+    active:days.size,
+    consistency:Math.round(1000*days.size/elapsed)/10,
+    accuracy:accuracyPct,
+    mistakesCount:mList.length,
+    todayRevisionDone,
+    streak:streakInfo.streak,
+    availableFreezes:streakInfo.availableFreezes,
+    isTodayFrozen:streakInfo.isTodayFrozen,
+    history:Object.entries(sn).sort().map(([date,x])=>({date,...x})),
+    subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),
+    diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))
+  };
+}
+
+function renderRevisionBox(d){
+  const t=today();
+  const rd=revData();
+  const [s1,s2]=getDailyRevisionPair(t);
+  const todayRev=rd[t]||{s1:false,s2:false};
+  const doneCount=(todayRev.s1?1:0)+(todayRev.s2?1:0);
+  
+  const badge=$("revisionStatusBadge");
+  if(badge){
+    if(d.isTodayFrozen){
+      badge.textContent="🧊 Streak Freeze Active (Rank & Streak Safe)";
+      badge.style.borderColor="#0284c7";
+      badge.style.color="#38bdf8";
+    } else if(doneCount===2){
+      badge.textContent="✓ Revision Complete (Rank Maintained)";
+      badge.style.borderColor="#23d5ab";
+      badge.style.color="#23d5ab";
+    } else {
+      badge.textContent=`Today: ${doneCount}/2 Done (+40 Pending Penalty)`;
+      badge.style.borderColor="#ff5f6d";
+      badge.style.color="#f4f7fb";
+    }
+  }
+
+  const rCards=$("revisionCards");
+  if(rCards){
+    rCards.innerHTML=`
+      <div class="revision-card ${todayRev.s1?'done':''}">
+        <div class="revision-info">
+          <small class="muted">SUBJECT 1 TARGET</small>
+          <b>${safe(s1)}</b>
+          <small>${config.subjects[s1]}% GATE Weight</small>
+        </div>
+        <button class="rev-btn ${todayRev.s1?'checked':''}" onclick="toggleRevision('s1')">${todayRev.s1?'✓ Done':'Mark Done'}</button>
+      </div>
+      <div class="revision-card ${todayRev.s2?'done':''}">
+        <div class="revision-info">
+          <small class="muted">SUBJECT 2 TARGET</small>
+          <b>${safe(s2)}</b>
+          <small>${config.subjects[s2]}% GATE Weight</small>
+        </div>
+        <button class="rev-btn ${todayRev.s2?'checked':''}" onclick="toggleRevision('s2')">${todayRev.s2?'✓ Done':'Mark Done'}</button>
+      </div>
+    `;
+  }
+}
+
+function toggleRevision(key){
+  const t=today();
+  const rd=revData();
+  if(!rd[t]) rd[t]={s1:false,s2:false};
+  rd[t][key]=!rd[t][key];
+  saveRev(rd);
+  
+  const isAllDone=rd[t].s1 && rd[t].s2;
+  toast(isAllDone ? "Both revised! Rank preserved." : "Revision status updated.");
+  load();
+}
+
+function addMistakeEntry(){
+  const subj=$('errSubject').value;
+  const type=$('errType').value;
+  const qSummary=$('errQuestion').value.trim();
+  const takeaway=$('errTakeaway').value.trim();
+
+  if(!qSummary){
+    toast("Enter a short summary of the mistake / problem.");
+    return;
+  }
+
+  const mList=mistakesData();
+  const entry={
+    id:Date.now(),
+    date:today(),
+    subject:subj,
+    type:type,
+    question:qSummary,
+    takeaway:takeaway || "Review fundamental concepts."
+  };
+  mList.push(entry);
+  saveMistakes(mList);
+
+  $('errQuestion').value="";
+  $('errTakeaway').value="";
+  toast("Mistake logged to Notebook.");
+  load();
+}
+
+function removeMistakeEntry(id){
+  if(!confirm("Delete this mistake log entry?")) return;
+  const mList=mistakesData().filter(x=>x.id!==id);
+  saveMistakes(mList);
+  toast("Mistake log removed.");
+  load();
+}
+
+function renderMistakes(){
+  const mList=mistakesData().slice().sort((a,b)=>b.id-a.id);
+  const badge=$("errorCountBadge");
+  if(badge) badge.textContent=`${mList.length} Total Mistakes Logged`;
+
+  const tagClassMap={
+    "Calculation Slip":"tag-calc",
+    "Concept Gap":"tag-concept",
+    "Formula Forgot":"tag-formula",
+    "Question Misread":"tag-misread",
+    "Time Pressure":"tag-time"
+  };
+
+  const mLog=$("mistakeLog");
+  if(!mLog) return;
+  mLog.innerHTML=mList.length ? mList.map(x=>{
+    const tagClass=tagClassMap[x.type] || "tag-concept";
+    return `
+      <tr>
+        <td style="white-space:nowrap">${label(x.date)}</td>
+        <td><b>${safe(x.subject)}</b></td>
+        <td><span class="tag-badge ${tagClass}">${safe(x.type)}</span></td>
+        <td>${safe(x.question)}</td>
+        <td style="color:#b9c3d4">${safe(x.takeaway)}</td>
+        <td><button class="btn danger" style="padding:4px 8px;font-size:11px" onclick="removeMistakeEntry(${x.id})">×</button></td>
+      </tr>
+    `;
+  }).join("") : `<tr><td colspan="6" class="empty">No mistakes logged yet. Keep practicing with clean accuracy!</td></tr>`;
+}
+
 function renderSubjectTotals(){
   const es=entries();
   const totalsBySubject={};
@@ -386,18 +574,22 @@ function renderSubjectTotals(){
   const totalSolved=Object.values(totalsBySubject).reduce((a,b)=>a+b,0);
   const maxSolved=Math.max(...Object.values(totalsBySubject),1);
   
-  $("subjectTotalSummary").textContent=`Total Solved Across All Subjects: ${fmt(totalSolved)} problems`;
+  const totalSumm=$("subjectTotalSummary");
+  if(totalSumm) totalSumm.textContent=`Total Solved Across All Subjects: ${fmt(totalSolved)} problems`;
   
-  $("subjectTotalRows").innerHTML=Object.keys(config.subjects).sort((a,b)=>totalsBySubject[b]-totalsBySubject[a]).map(subject=>{
-    const solved=totalsBySubject[subject]||0;
-    const sharePct=totalSolved>0?((solved/totalSolved)*100).toFixed(1):"0.0";
-    const barPct=Math.min(100,(solved/maxSolved)*100);
-    return `<div class="stat-row"><div class="stat-head"><span>${safe(subject)}</span><span><b>${fmt(solved)}</b> Q <span class="muted">(${sharePct}%)</span></span></div><div class="stat-bar"><i style="width:${barPct}%"></i></div></div>`;
-  }).join("");
+  const sRows=$("subjectTotalRows");
+  if(sRows){
+    sRows.innerHTML=Object.keys(config.subjects).sort((a,b)=>totalsBySubject[b]-totalsBySubject[a]).map(subject=>{
+      const solved=totalsBySubject[subject]||0;
+      const sharePct=totalSolved>0?((solved/totalSolved)*100).toFixed(1):"0.0";
+      const barPct=Math.min(100,(solved/maxSolved)*100);
+      return `<div class="stat-row"><div class="stat-head"><span>${safe(subject)}</span><span><b>${fmt(solved)}</b> Q <span class="muted">(${sharePct}%)</span></span></div><div class="stat-bar"><i style="width:${barPct}%"></i></div></div>`;
+    }).join("");
+  }
 }
 
-function renderIITRewards(){
-  const current=Number($("rank").textContent.replace(/,/g,""));
+function renderIITRewards(currentRankVal){
+  const current=currentRankVal || Number(($("rank")?.textContent||"100000").replace(/,/g,""));
   const sortedAsc=[...IIT_REWARDS].sort((a,b)=>a.rank-b.rank);
   const sortedDesc=[...IIT_REWARDS].sort((a,b)=>b.rank-a.rank);
   
@@ -406,57 +598,241 @@ function renderIITRewards(){
   const nextTarget=sortedDesc.find(x=>current>x.rank) || null;
 
   const topTag=$("topIitTag");
-  if(best){
-    if(topTag) topTag.innerHTML=`🎯 Unlocked: <b>${safe(best.name)}</b>`;
-  }else if(nextTarget){
-    if(topTag) topTag.innerHTML=`🎯 Next: <b>${safe(nextTarget.name)}</b> (≤${fmt(nextTarget.rank)})`;
+  if(topTag){
+    if(best){
+      topTag.innerHTML=`🎯 Unlocked: <b>${safe(best.name)}</b>`;
+    }else if(nextTarget){
+      topTag.innerHTML=`🎯 Next: <b>${safe(nextTarget.name)}</b> (≤${fmt(nextTarget.rank)})`;
+    }
   }
 
-  if(best){
-    const nextBetter=[...sortedDesc].reverse().find(x=>x.rank<best.rank);
-    const gap=nextBetter?current-nextBetter.rank:0;
-    $("rewardCurrent").innerHTML=`
-      <div class="reward-current">
-        <div class="small">CURRENT BEST UNLOCKED MILESTONE</div>
-        <div class="big">${safe(best.name)}</div>
-        <div style="color:var(--accent2);font-weight:600;font-size:13px">${safe(best.tier)}</div>
-        <div class="small" style="margin-top:8px">
-          Training Rank: <b>${fmt(current)}</b> · Unlocked at: ≤ ${fmt(best.rank)}
-          ${nextBetter?`<br><span style="color:#b9c3d4">Next Goal: <b>${safe(nextBetter.name)}</b> (Rank ≤ ${fmt(nextBetter.rank)}) · <b>${fmt(gap)}</b> places to go</span>`:""}
-        </div>
-      </div>`;
-  }else{
-    const target=nextTarget||sortedDesc[0];
-    const gap=current-target.rank;
-    $("rewardCurrent").innerHTML=`
-      <div class="reward-current">
-        <div class="small">NEXT MILESTONE TARGET</div>
-        <div class="big">${safe(target.name)}</div>
-        <div style="color:var(--warning);font-weight:600;font-size:13px">${safe(target.tier)}</div>
-        <div class="small" style="margin-top:8px">
-          Current Rank: <b>${fmt(current)}</b> · Target: ≤ <b>${fmt(target.rank)}</b> (<b>${fmt(gap)}</b> places to reduce)
-        </div>
-      </div>`;
+  const curRew=$("rewardCurrent");
+  if(curRew){
+    if(best){
+      const nextBetter=[...sortedDesc].reverse().find(x=>x.rank<best.rank);
+      const gap=nextBetter?current-nextBetter.rank:0;
+      curRew.innerHTML=`
+        <div class="reward-current">
+          <div class="small">CURRENT BEST UNLOCKED MILESTONE</div>
+          <div class="big">${safe(best.name)}</div>
+          <div style="color:var(--accent2);font-weight:600;font-size:13px">${safe(best.tier)}</div>
+          <div class="small" style="margin-top:8px">
+            Training Rank: <b>${fmt(current)}</b> · Unlocked at: ≤ ${fmt(best.rank)}
+            ${nextBetter?`<br><span style="color:#b9c3d4">Next Goal: <b>${safe(nextBetter.name)}</b> (Rank ≤ ${fmt(nextBetter.rank)}) · <b>${fmt(gap)}</b> places to go</span>`:""}
+          </div>
+        </div>`;
+    }else{
+      const target=nextTarget||sortedDesc[0];
+      const gap=current-target.rank;
+      curRew.innerHTML=`
+        <div class="reward-current">
+          <div class="small">NEXT MILESTONE TARGET</div>
+          <div class="big">${safe(target.name)}</div>
+          <div style="color:var(--warning);font-weight:600;font-size:13px">${safe(target.tier)}</div>
+          <div class="small" style="margin-top:8px">
+            Current Rank: <b>${fmt(current)}</b> · Target: ≤ <b>${fmt(target.rank)}</b> (<b>${fmt(gap)}</b> places to reduce)
+          </div>
+        </div>`;
+    }
   }
 
-  $("rewardList").innerHTML=sortedDesc.map(x=>{
-    const isUnlocked=current<=x.rank;
-    return `
-      <div class="reward-item ${isUnlocked?"unlocked":""}">
-        <div class="reward-rank">${isUnlocked?"✓":"🔒"} ≤ ${fmt(x.rank)}</div>
-        <div>
-          <div class="reward-name">${safe(x.name)}</div>
-          <div class="reward-sub">${safe(x.tier)} · ${isUnlocked?"<span style='color:var(--accent2)'>Unlocked</span>":"Locked"}</div>
-        </div>
-      </div>`;
-  }).join("");
+  const rList=$("rewardList");
+  if(rList){
+    rList.innerHTML=sortedDesc.map(x=>{
+      const isUnlocked=current<=x.rank;
+      return `
+        <div class="reward-item ${isUnlocked?"unlocked":""}">
+          <div class="reward-rank">${isUnlocked?"✓":"🔒"} ≤ ${fmt(x.rank)}</div>
+          <div>
+            <div class="reward-name">${safe(x.name)}</div>
+            <div class="reward-sub">${safe(x.tier)} · ${isUnlocked?"<span style='color:var(--accent2)'>Unlocked</span>":"Locked"}</div>
+          </div>
+        </div>`;
+    }).join("");
+  }
 }
 
-function renderAddedFeatures(){renderSubjectTotals();renderIITRewards();}
-const originalLoad=load;
-load=function(){originalLoad();renderAddedFeatures();};
-window.addEventListener("load",renderAddedFeatures);
-</script>
+function load(){
+  const d=dashboard();
+  if($("rank")) $("rank").textContent=fmt(d.rank);
+  if($("improve")) $("improve").textContent=`${fmt(d.improve)} rank places gained`;
+  if($("total")) $("total").textContent=fmt(d.q);
+  if($("today")) $("today").textContent=`Today: ${fmt(d.tq)} questions`;
+  if($("points")) $("points").textContent=d.p.toFixed(1);
+  
+  if($("streakVal")) $("streakVal").textContent=`${d.streak} ${d.streak===1?'Day':'Days'}`;
+  if($("streakSub")) $("streakSub").textContent=d.isTodayFrozen ? "🧊 Protected today with Streak Freeze" : (d.tq>=3 && d.todayRevisionDone ? "🔥 Today's streak goal completed!" : "Pending: Min 3 Qs + 2 Revs");
+  if($("topStreakTag")) $("topStreakTag").textContent=`🔥 Streak: ${d.streak} Days`;
+  if($("topFreezeTag")) $("topFreezeTag").textContent=`🧊 Freezes: ${d.availableFreezes}/${MAX_FREEZES_PER_MONTH}`;
+  
+  const freezeBtn=$("useFreezeBtn");
+  if(freezeBtn){
+    if(d.isTodayFrozen){
+      freezeBtn.textContent="🧊 Unfreeze Today";
+      freezeBtn.style.background="linear-gradient(135deg,#0369a1,#075985)";
+    } else {
+      freezeBtn.textContent="🧊 Use Freeze Today";
+      freezeBtn.style.background="linear-gradient(135deg,#0284c7,#0369a1)";
+    }
+  }
 
+  if($("accuracyVal")) $("accuracyVal").textContent=d.accuracy+"%";
+  if($("accuracySub")) $("accuracySub").textContent=`${fmt(d.mistakesCount)} recorded errors (${fmt(d.q)} clean solved)`;
+  if($("days")) $("days").textContent=Math.max(0,Math.ceil((new Date(config.end_date)-new Date(today()))/86400000))+" days remaining";
+  
+  renderRevisionBox(d);
+  renderMistakes();
+  renderSubjects(d);
+  renderCharts(d);
+  renderLog();
+  renderHistory();
+  renderSubjectTotals();
+  renderIITRewards(d.rank);
+}
+
+function renderSubjects(d){
+  const max=Math.max(...Object.values(config.subjects));
+  const by=new Map(d.subjects.map(x=>[x.subject,x]));
+  const subjBox=$("subjects");
+  if(subjBox){
+    subjBox.innerHTML=Object.entries(config.subjects).sort((a,b)=>b[1]-a[1]).map(([s,w])=>{
+      const x=by.get(s);
+      return `<div class="subject"><div class="subject-head"><span>${safe(s)}</span><span>${fmt(x.q)} Q · ${x.p.toFixed(1)} pts</span></div><div class="progress"><i style="width:${Math.min(100,w/max*100)}%"></i></div></div>`;
+    }).join("");
+  }
+}
+
+function renderCharts(d){
+  const rcEl=$("rankChart");
+  if(rcEl){
+    if(rankChart) rankChart.destroy();
+    rankChart=new Chart(rcEl,{type:"line",data:{labels:d.history.map(x=>x.date),datasets:[{label:"Training rank",data:d.history.map(x=>x.rank),tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{reverse:true,grid:{color:"#202a3a"}},x:{grid:{display:false}}}}});
+  }
+
+  const dcEl=$("difficultyChart");
+  if(dcEl){
+    if(difficultyChart) difficultyChart.destroy();
+    difficultyChart=new Chart(dcEl,{type:"doughnut",data:{labels:d.diff.filter(x=>x.q).map(x=>x.difficulty.toUpperCase()),datasets:[{data:d.diff.filter(x=>x.q).map(x=>x.q)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#aab4c7"}}}}});
+  }
+}
+
+function renderLog(){
+  const rows=entries().filter(x=>x.entry_date===today()).sort((a,b)=>b.id-a.id);
+  const logBox=$("log");
+  if(logBox){
+    logBox.innerHTML=rows.length?rows.map(x=>`<tr><td>${safe(x.subject)}</td><td>${x.difficulty.toUpperCase()}</td><td>${x.questions}</td><td>+${(+x.points).toFixed(1)}</td><td><button class="btn danger" style="padding:6px 9px" onclick="removeEntry(${x.id})">×</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">No problems recorded today.</td></tr>`;
+  }
+}
+
+function renderHistory(){
+  const g={};
+  entries().forEach(x=>{g[x.entry_date]??={q:0,p:0,n:0};g[x.entry_date].q+=+x.questions;g[x.entry_date].p+=+x.points;g[x.entry_date].n++});
+  const ds=Object.keys(g).sort().reverse();
+  const histBox=$("historyLog");
+  if(histBox){
+    histBox.innerHTML=ds.length?ds.map(d=>`<tr><td>${label(d)}</td><td>${fmt(g[d].q)}</td><td>${g[d].p.toFixed(1)}</td><td>${g[d].n}</td><td><button class="btn secondary" style="padding:6px 10px" onclick="showHistory('${d}')">View</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">No study history yet.</td></tr>`;
+  }
+}
+
+function showHistory(d){
+  const rows=entries().filter(x=>x.entry_date===d).sort((a,b)=>b.id-a.id);
+  if($("historyTitle")) $("historyTitle").textContent=label(d)+" — Details";
+  if($("historyDetailLog")) $("historyDetailLog").innerHTML=rows.map(x=>`<tr><td>${safe(x.subject)}</td><td>${x.difficulty.toUpperCase()}</td><td>${x.questions}</td><td>+${(+x.points).toFixed(1)}</td><td><button class="btn danger" style="padding:6px 9px" onclick="removeEntry(${x.id})">×</button></td></tr>`).join("");
+  const hd=$("historyDetails");
+  if(hd){
+    hd.style.display="block";
+    hd.scrollIntoView({behavior:"smooth"});
+  }
+}
+
+function closeHistoryDetails(){
+  const hd=$("historyDetails");
+  if(hd) hd.style.display="none";
+}
+
+function addEntry(){
+  const q=+$('questions').value;
+  if(!q||q<1){toast("Enter the number of problems.");return}
+  const es=entries(),todayQuestions=es.filter(x=>x.entry_date===today()).reduce((a,x)=>a+ +x.questions,0);
+  if(todayQuestions+q<3){toast(`You must solve at least 3 problems today. Add ${3-todayQuestions} more.`);return}
+  const e={id:Date.now(),entry_date:today(),subject:$('subject').value,difficulty:$('difficulty').value,questions:q,points:pointsFor($('subject').value,$('difficulty').value,q),created_at:new Date().toISOString()};
+  es.push(e);save(es);$('questions').value="";
+  const d=dashboard();toast(`Added. Rank → ${fmt(d.rank)}`);load();
+}
+
+function removeEntry(id){
+  if(!confirm("Delete this entry?")) return;
+  save(entries().filter(x=>x.id!==id));
+  closeHistoryDetails();
+  toast("Entry deleted.");
+  load();
+}
+
+function exportData(){
+  const b=new Blob([JSON.stringify({version:1,exported_at:new Date().toISOString(),entries:entries(),snapshots:snaps(),revision:revData(),mistakes:mistakesData(),freezes:freezeData()},null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");
+  a.href=u;a.download="gate-da-tracker-backup.json";a.click();URL.revokeObjectURL(u);
+  toast("Backup exported.");
+}
+
+function importData(){$("importFile").click()}
+function handleImport(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const x=JSON.parse(r.result);
+      if(!Array.isArray(x.entries))throw Error("Invalid backup file.");
+      save(x.entries);
+      if(x.snapshots)saveSnaps(x.snapshots);
+      if(x.revision)saveRev(x.revision);
+      if(x.mistakes)saveMistakes(x.mistakes);
+      if(x.freezes)saveFreezes(x.freezes);
+      load();
+      toast("Backup restored successfully.");
+    }catch(err){toast(err.message)}
+    e.target.value="";
+  };
+  r.readAsText(f);
+}
+
+function init(){
+  config=CONFIG;
+  const subjSelect=$('subject');
+  const errSubjSelect=$('errSubject');
+  const diffSelect=$('difficulty');
+
+  if(subjSelect && errSubjSelect){
+    subjSelect.innerHTML="";
+    errSubjSelect.innerHTML="";
+    for(const[s,w]of Object.entries(config.subjects)){
+      const o=document.createElement("option");
+      o.value=s;
+      o.textContent=`${s} · ${w.toFixed(2)}%`;
+      subjSelect.appendChild(o);
+
+      const o2=document.createElement("option");
+      o2.value=s;
+      o2.textContent=s;
+      errSubjSelect.appendChild(o2);
+    }
+  }
+
+  if(diffSelect){
+    diffSelect.innerHTML="";
+    for(const[d,m]of Object.entries(config.difficulty)){
+      const o=document.createElement("option");
+      o.value=d;
+      o.textContent=`${d.toUpperCase()} · ×${m}`;
+      diffSelect.appendChild(o);
+    }
+  }
+
+  if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  load();
+}
+
+window.addEventListener("DOMContentLoaded", init);
+</script>
 </body>
 </html>
