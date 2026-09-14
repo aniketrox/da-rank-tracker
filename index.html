@@ -161,7 +161,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .btn.danger{background:#29141a;color:#ff9aa2}
 .btn.freeze-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:#f0f9ff}
 .btn.sync-btn{background:linear-gradient(135deg,#0284c7,#23d5ab);color:#061016}
-.chartbox{height:290px;position:relative}
+.chartbox{height:320px;position:relative}
 .table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table{width:100%;min-width:480px;border-collapse:collapse}
 .table th,.table td{text-align:left;padding:11px 8px;border-bottom:1px solid #202a3a;font-size:13px}
@@ -191,6 +191,19 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .timer-actions{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .timer-pill{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#151e2c;border:1px solid #263348;color:#94a3b8;cursor:pointer}
 .timer-pill.active{background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;border-color:#7c5cff}
+
+/* Competition Comparison Cards */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.comp-card{background:#0c121c;border:1px solid #1f2b3e;border-radius:14px;padding:14px;position:relative}
+.comp-card.you{border-color:#7c5cff;background:linear-gradient(135deg,#161336,#0c131d)}
+.comp-card.target{border-color:#e67e2255;background:linear-gradient(135deg,#1f160e,#0e131d)}
+.comp-card.apex{border-color:#23d5ab55;background:linear-gradient(135deg,#0c221e,#0e131d)}
+.comp-tag{font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase}
+.comp-card.you .comp-tag{color:var(--accent)}
+.comp-card.target .comp-tag{color:#f39c12}
+.comp-card.apex .comp-tag{color:var(--accent2)}
+.comp-rank{font-family:"Space Grotesk",sans-serif;font-size:26px;font-weight:700}
+.comp-meta{font-size:12px;color:var(--muted);margin-top:4px}
 
 /* Revision Section */
 .revision-box{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -237,6 +250,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .error-form{grid-template-columns:1fr 1fr}
  .timer-container{grid-template-columns:1fr}
  .timer-actions{justify-content:flex-start}
+ .comp-grid{grid-template-columns:1fr}
 }
 @media(max-width:768px){
  .app{padding:14px}
@@ -252,7 +266,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .form{grid-template-columns:1fr;gap:10px}
  .error-form{grid-template-columns:1fr}
  .form select, .form input, .form .btn, .error-form select, .error-form input, .error-form .btn{width:100%}
- .chartbox{height:240px}
+ .chartbox{height:260px}
  .revision-box{grid-template-columns:1fr}
  .reward-item{grid-template-columns:95px 1fr}
  .sync-grid{grid-template-columns:1fr}
@@ -375,6 +389,41 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   </div>
  </div>
 
+ <!-- Multi-Competitor Trajectory & Live Race Chart -->
+ <div class="card panel8">
+  <div class="title-row">
+    <div>
+      <h2>🏁 Rank Race & Competition Trajectory</h2>
+      <p>Compare your actual rank trajectory against standard aspirant benchmarks.</p>
+    </div>
+  </div>
+  
+  <div class="comp-grid">
+    <div class="comp-card you">
+      <div class="comp-tag">YOU (Actual Pace)</div>
+      <div class="comp-rank" id="compYouRank">—</div>
+      <div class="comp-meta" id="compYouMeta">Total: 0 Qs</div>
+    </div>
+    <div class="comp-card target">
+      <div class="comp-tag">Aspirant A (15 Qs/day)</div>
+      <div class="comp-rank" id="compTargetRank">—</div>
+      <div class="comp-meta" id="compTargetMeta">15 Q/day + 2 Revs</div>
+    </div>
+    <div class="comp-card apex">
+      <div class="comp-tag">Apex Rival (22 Qs/day)</div>
+      <div class="comp-rank" id="compApexRank">—</div>
+      <div class="comp-meta" id="compApexMeta">22 Q/day + 2 Revs</div>
+    </div>
+  </div>
+
+  <div class="chartbox"><canvas id="rankChart"></canvas></div>
+ </div>
+
+ <div class="card panel4">
+  <div class="title-row"><div><h2>Difficulty mix</h2><p>Your solving quality profile</p></div></div>
+  <div class="chartbox"><canvas id="difficultyChart"></canvas></div>
+ </div>
+
  <!-- Accuracy & Mistake Notebook Card -->
  <div class="card panel12">
   <div class="title-row">
@@ -434,16 +483,6 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <small class="muted" style="display:block;margin-top:8px">
     💡 <b>Tip:</b> Auto-sync triggers seamlessly whenever you log a problem, complete revision, log a mistake, or freeze a day.
   </small>
- </div>
-
- <div class="card panel8">
-  <div class="title-row"><div><h2>Rank trajectory</h2><p>Lower is better.</p></div></div>
-  <div class="chartbox"><canvas id="rankChart"></canvas></div>
- </div>
-
- <div class="card panel4">
-  <div class="title-row"><div><h2>Difficulty mix</h2><p>Your solving quality profile</p></div></div>
-  <div class="chartbox"><canvas id="difficultyChart"></canvas></div>
  </div>
 
  <div class="card panel6">
@@ -846,6 +885,13 @@ function toggleStreakFreezeToday(){
   triggerAutoSync();
 }
 
+/* Competitor Benchmark Simulation Logic */
+// Model an aspirant solving Q questions per day with balanced difficulty (Easy 20%, Med 40%, Hard 25%, PYQ 15%)
+function getSimulatedPointsForDay(qPerDay){
+  const avgDiffMultiplier = (0.20 * 0.75) + (0.40 * 1.0) + (0.25 * 1.35) + (0.15 * 1.50); // ~1.1125
+  return qPerDay * avgDiffMultiplier;
+}
+
 function dashboard(){
   const es=entries(), t=today(), q=es.reduce((a,x)=>a+ +x.questions,0), p=es.reduce((a,x)=>a+ +x.points,0), te=es.filter(x=>x.entry_date===t), days=new Set(es.map(x=>x.entry_date));
   let sn=snaps();
@@ -867,6 +913,36 @@ function dashboard(){
   sn[t]={rank:currentRank,total_questions:q,points:p};
   saveSnaps(sn);
 
+  // Compute Simulated Competitor Cumulative History across elapsed timeline
+  const competitorHistory = [];
+  let comp15Points = 0;
+  let comp22Points = 0;
+  const ptsPerDay15 = getSimulatedPointsForDay(15);
+  const ptsPerDay22 = getSimulatedPointsForDay(22);
+
+  for(let i=0; i<elapsed; i++){
+    const d=new Date(st);
+    d.setDate(d.getDate()+i);
+    const dStr=localDateKey(d);
+    
+    comp15Points += ptsPerDay15;
+    comp22Points += ptsPerDay22;
+
+    const rank15 = rank(comp15Points);
+    const rank22 = rank(comp22Points);
+    const userSnap = sn[dStr];
+
+    competitorHistory.push({
+      date: dStr,
+      userRank: userSnap ? userSnap.rank : null,
+      rank15: rank15,
+      rank22: rank22
+    });
+  }
+
+  const latestComp15 = rank(elapsed * ptsPerDay15);
+  const latestComp22 = rank(elapsed * ptsPerDay22);
+
   const totalAttempts=q + mList.length;
   const accuracyPct=totalAttempts > 0 ? ((q / totalAttempts) * 100).toFixed(1) : "100.0";
   const streakInfo=calculateStreakAndFreezes();
@@ -885,6 +961,10 @@ function dashboard(){
     availableFreezes:streakInfo.availableFreezes,
     isTodayFrozen:streakInfo.isTodayFrozen,
     history:Object.entries(sn).sort().map(([date,x])=>({date,...x})),
+    competitorHistory,
+    latestComp15,
+    latestComp22,
+    elapsedDays: elapsed,
     subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),
     diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))
   };
@@ -1137,6 +1217,19 @@ function renderIITRewards(currentRankVal){
   }
 }
 
+function renderCompetitionCards(d){
+  if($("compYouRank")) $("compYouRank").textContent = fmt(d.rank);
+  if($("compYouMeta")) $("compYouMeta").textContent = `${fmt(d.q)} Qs solved (${d.active} active days)`;
+
+  const q15Total = d.elapsedDays * 15;
+  if($("compTargetRank")) $("compTargetRank").textContent = fmt(d.latestComp15);
+  if($("compTargetMeta")) $("compTargetMeta").textContent = `${fmt(q15Total)} Qs total (15 Q/day pace)`;
+
+  const q22Total = d.elapsedDays * 22;
+  if($("compApexRank")) $("compApexRank").textContent = fmt(d.latestComp22);
+  if($("compApexMeta")) $("compApexMeta").textContent = `${fmt(q22Total)} Qs total (22 Q/day pace)`;
+}
+
 function load(){
   const d=dashboard();
   if($("rank")) $("rank").textContent=fmt(d.rank);
@@ -1167,6 +1260,7 @@ function load(){
   
   renderDailyGoalBar(d.tq);
   renderRevisionBox(d);
+  renderCompetitionCards(d);
   renderMistakes();
   renderSubjects(d);
   renderCharts(d);
@@ -1193,7 +1287,87 @@ function renderCharts(d){
   const rcEl=$("rankChart");
   if(rcEl){
     if(rankChart) rankChart.destroy();
-    rankChart=new Chart(rcEl,{type:"line",data:{labels:d.history.map(x=>x.date),datasets:[{label:"Training rank",data:d.history.map(x=>x.rank),tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{reverse:true,grid:{color:"#202a3a"}},x:{grid:{display:false}}}}});
+    
+    // Multi-line chart comparing You, 15 Q/day, and 22 Q/day
+    const labels = d.competitorHistory.map(x=>x.date);
+    const userData = d.competitorHistory.map(x=>x.userRank);
+    const comp15Data = d.competitorHistory.map(x=>x.rank15);
+    const comp22Data = d.competitorHistory.map(x=>x.rank22);
+
+    rankChart=new Chart(rcEl,{
+      type:"line",
+      data:{
+        labels: labels,
+        datasets:[
+          {
+            label:"You (Actual)",
+            data: userData,
+            borderColor:"#7c5cff",
+            backgroundColor:"rgba(124,92,255,0.15)",
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true,
+            pointRadius: 3
+          },
+          {
+            label:"Aspirant A (15 Q/day)",
+            data: comp15Data,
+            borderColor:"#f39c12",
+            borderDash: [5, 5],
+            borderWidth: 2,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label:"Apex Rival (22 Q/day)",
+            data: comp22Data,
+            borderColor:"#23d5ab",
+            borderDash: [3, 3],
+            borderWidth: 2,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 0
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins:{
+          legend:{
+            display:true,
+            position:"top",
+            labels:{
+              color:"#b9c3d4",
+              font:{size: 11, family: "DM Sans"}
+            }
+          },
+          tooltip:{
+            callbacks:{
+              label: function(context){
+                return `${context.dataset.label}: Rank ${fmt(context.parsed.y)}`;
+              }
+            }
+          }
+        },
+        scales:{
+          y:{
+            reverse:true,
+            grid:{color:"#202a3a"},
+            ticks:{color:"#8f9bb0"}
+          },
+          x:{
+            grid:{display:false},
+            ticks:{color:"#8f9bb0", maxTicksLimit: 8}
+          }
+        }
+      }
+    });
   }
 
   const dcEl=$("difficultyChart");
@@ -1308,7 +1482,7 @@ function startLoadingSequence(){
 
   const steps = [
     { pct: 25, text: "Verifying Local Storage & Vault…" },
-    { pct: 55, text: "Computing Rank Vectors & IIT Milestones…" },
+    { pct: 55, text: "Computing Rank Vectors & Rival Simulators…" },
     { pct: 85, text: "Calibrating Daily Revision & Streaks…" },
     { pct: 100, text: "Command Center Online" }
   ];
