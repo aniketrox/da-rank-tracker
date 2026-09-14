@@ -193,6 +193,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .extra-card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
 .extra-card h2{margin:0}.extra-card p{color:var(--muted);font-size:13px;margin:5px 0 16px}
 .stat-row{margin:14px 0}.stat-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.stat-bar{height:9px;background:#20293a;border-radius:99px;overflow:hidden}.stat-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#23d5ab);border-radius:99px;transition:width .25s}
+.stat-bar.rev-bar i{background:linear-gradient(90deg,#38bdf8,#7c5cff)}
 .reward-current{border:1px solid #413477;background:linear-gradient(135deg,#18133c,#101a24);border-radius:16px;padding:16px;margin-bottom:14px}
 .reward-current .big{font:700 24px "Space Grotesk";margin:5px 0}
 .reward-current .small{color:var(--muted);font-size:12px}
@@ -382,13 +383,23 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  </div>
 </section>
 
+<!-- Subject Problem Totals & Revision Counts Grid -->
 <section class="extra-grid" id="addedFeatures">
   <div class="extra-card">
-    <div class="title-row"><div><h2>📚 Total Problems Solved by Subject</h2><p>Cumulative problems solved across all study sessions till now.</p></div></div>
+    <div class="title-row"><div><h2>📚 Problems Solved by Subject</h2><p>Cumulative problems solved across all study sessions till now.</p></div></div>
     <div id="subjectTotalSummary" class="muted" style="font-size:13px;margin-bottom:12px"></div>
     <div id="subjectTotalRows"></div>
   </div>
 
+  <div class="extra-card">
+    <div class="title-row"><div><h2>🔄 Revision Frequency by Subject</h2><p>Total times each subject was reviewed across all daily targets.</p></div></div>
+    <div id="revisionTotalSummary" class="muted" style="font-size:13px;margin-bottom:12px"></div>
+    <div id="revisionTotalRows"></div>
+  </div>
+</section>
+
+<!-- IIT Rewards Grid -->
+<section style="margin-top:16px">
   <div class="extra-card">
     <div class="title-row"><div><h2>🏆 IIT Rank Rewards</h2><p>Motivation ladder based on your training rank. It is not an admission cutoff or guarantee.</p></div></div>
     <div id="rewardCurrent"></div>
@@ -455,10 +466,45 @@ function getDailyRevisionPair(dateStr){
   return [subList[idx1], subList[idx2]];
 }
 
+// Normalizes any format (named subject keys or legacy s1/s2) into named subject mapping
+function getNormalizedRevisionData(){
+  const raw=revData();
+  const normalized={};
+  Object.entries(raw).forEach(([dateStr, obj])=>{
+    if(!obj || typeof obj!=="object") return;
+    normalized[dateStr]={};
+    const [s1, s2]=getDailyRevisionPair(dateStr);
+    
+    // Check named subject keys first, fall back to legacy s1/s2
+    if(obj[s1]!==undefined) normalized[dateStr][s1]=Boolean(obj[s1]);
+    else if(obj.s1!==undefined) normalized[dateStr][s1]=Boolean(obj.s1);
+    else normalized[dateStr][s1]=false;
+
+    if(obj[s2]!==undefined) normalized[dateStr][s2]=Boolean(obj[s2]);
+    else if(obj.s2!==undefined) normalized[dateStr][s2]=Boolean(obj.s2);
+    else normalized[dateStr][s2]=false;
+  });
+  return normalized;
+}
+
+function calculateRevisionCounts(){
+  const rd=getNormalizedRevisionData();
+  const counts={};
+  Object.keys(CONFIG.subjects).forEach(s=>counts[s]=0);
+
+  Object.values(rd).forEach(dayObj=>{
+    Object.entries(dayObj).forEach(([subjName, isDone])=>{
+      if(isDone && counts[subjName]!==undefined) counts[subjName]++;
+    });
+  });
+
+  return counts;
+}
+
 function calculateStreakAndFreezes(){
   const t=today();
   const es=entries();
-  const rd=revData();
+  const rd=getNormalizedRevisionData();
   const freezes=freezeData();
   
   const curMonthKey=t.slice(0,7);
@@ -468,8 +514,9 @@ function calculateStreakAndFreezes(){
   const isDateSatisfied=dateStr=>{
     if(freezes.includes(dateStr)) return true;
     const dayQs=es.filter(x=>x.entry_date===dateStr).reduce((a,b)=>a+ +b.questions,0);
-    const dayRev=rd[dateStr];
-    const revDone=Boolean(dayRev && dayRev.s1 && dayRev.s2);
+    const [s1, s2]=getDailyRevisionPair(dateStr);
+    const dayRev=rd[dateStr]||{};
+    const revDone=Boolean(dayRev[s1] && dayRev[s2]);
     return dayQs >= 3 && revDone;
   };
 
@@ -522,15 +569,16 @@ function toggleStreakFreezeToday(){
 function dashboard(){
   const es=entries(), t=today(), q=es.reduce((a,x)=>a+ +x.questions,0), p=es.reduce((a,x)=>a+ +x.points,0), te=es.filter(x=>x.entry_date===t), days=new Set(es.map(x=>x.entry_date));
   let sn=snaps();
-  const rd=revData();
+  const rd=getNormalizedRevisionData();
   const mList=mistakesData();
   const freezes=freezeData();
   const st=new Date(config.start_date+"T00:00:00"), now=new Date(t+"T00:00:00"), en=new Date(config.end_date+"T00:00:00");
   const elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);
 
+  const [s1, s2]=getDailyRevisionPair(t);
   const isFrozenToday=freezes.includes(t);
-  const todayRev=rd[t]||{s1:false,s2:false};
-  const todayRevisionDone=Boolean(todayRev.s1 && todayRev.s2);
+  const todayRev=rd[t]||{};
+  const todayRevisionDone=Boolean(todayRev[s1] && todayRev[s2]);
 
   const revisionPenalty=(todayRevisionDone || isFrozenToday) ? 0 : 40;
   const baseRank=rank(p);
@@ -564,10 +612,13 @@ function dashboard(){
 
 function renderRevisionBox(d){
   const t=today();
-  const rd=revData();
+  const rd=getNormalizedRevisionData();
   const [s1,s2]=getDailyRevisionPair(t);
-  const todayRev=rd[t]||{s1:false,s2:false};
-  const doneCount=(todayRev.s1?1:0)+(todayRev.s2?1:0);
+  const todayRev=rd[t]||{};
+  const isS1Done=Boolean(todayRev[s1]);
+  const isS2Done=Boolean(todayRev[s2]);
+  const doneCount=(isS1Done?1:0)+(isS2Done?1:0);
+  const allCounts=calculateRevisionCounts();
   
   const badge=$("revisionStatusBadge");
   if(badge){
@@ -589,34 +640,35 @@ function renderRevisionBox(d){
   const rCards=$("revisionCards");
   if(rCards){
     rCards.innerHTML=`
-      <div class="revision-card ${todayRev.s1?'done':''}">
+      <div class="revision-card ${isS1Done?'done':''}">
         <div class="revision-info">
-          <small class="muted">SUBJECT 1 TARGET</small>
+          <small class="muted">SUBJECT 1 TARGET · ${allCounts[s1]||0} REVISIONS DONE</small>
           <b>${safe(s1)}</b>
           <small>${config.subjects[s1]}% GATE Weight</small>
         </div>
-        <button class="rev-btn ${todayRev.s1?'checked':''}" onclick="toggleRevision('s1')">${todayRev.s1?'✓ Done':'Mark Done'}</button>
+        <button class="rev-btn ${isS1Done?'checked':''}" onclick="toggleRevision('${safe(s1)}')">${isS1Done?'✓ Done':'Mark Done'}</button>
       </div>
-      <div class="revision-card ${todayRev.s2?'done':''}">
+      <div class="revision-card ${isS2Done?'done':''}">
         <div class="revision-info">
-          <small class="muted">SUBJECT 2 TARGET</small>
+          <small class="muted">SUBJECT 2 TARGET · ${allCounts[s2]||0} REVISIONS DONE</small>
           <b>${safe(s2)}</b>
           <small>${config.subjects[s2]}% GATE Weight</small>
         </div>
-        <button class="rev-btn ${todayRev.s2?'checked':''}" onclick="toggleRevision('s2')">${todayRev.s2?'✓ Done':'Mark Done'}</button>
+        <button class="rev-btn ${isS2Done?'checked':''}" onclick="toggleRevision('${safe(s2)}')">${isS2Done?'✓ Done':'Mark Done'}</button>
       </div>
     `;
   }
 }
 
-function toggleRevision(key){
+function toggleRevision(subjectName){
   const t=today();
-  const rd=revData();
-  if(!rd[t]) rd[t]={s1:false,s2:false};
-  rd[t][key]=!rd[t][key];
+  const rd=getNormalizedRevisionData();
+  if(!rd[t]) rd[t]={};
+  rd[t][subjectName]=!rd[t][subjectName];
   saveRev(rd);
   
-  const isAllDone=rd[t].s1 && rd[t].s2;
+  const [s1,s2]=getDailyRevisionPair(t);
+  const isAllDone=Boolean(rd[t][s1] && rd[t][s2]);
   toast(isAllDone ? "Both revised! Rank preserved." : "Revision status updated.");
   load();
 }
@@ -707,6 +759,33 @@ function renderSubjectTotals(){
       const sharePct=totalSolved>0?((solved/totalSolved)*100).toFixed(1):"0.0";
       const barPct=Math.min(100,(solved/maxSolved)*100);
       return `<div class="stat-row"><div class="stat-head"><span>${safe(subject)}</span><span><b>${fmt(solved)}</b> Q <span class="muted">(${sharePct}%)</span></span></div><div class="stat-bar"><i style="width:${barPct}%"></i></div></div>`;
+    }).join("");
+  }
+}
+
+function renderRevisionTotals(){
+  const revCounts=calculateRevisionCounts();
+  const totalRevisions=Object.values(revCounts).reduce((a,b)=>a+b,0);
+  const maxRevisions=Math.max(...Object.values(revCounts),1);
+
+  const revSumm=$("revisionTotalSummary");
+  if(revSumm) revSumm.textContent=`Total Completed Revisions Across All Subjects: ${fmt(totalRevisions)} times`;
+
+  const revRows=$("revisionTotalRows");
+  if(revRows){
+    revRows.innerHTML=Object.keys(config.subjects).sort((a,b)=>revCounts[b]-revCounts[a]).map(subject=>{
+      const count=revCounts[subject]||0;
+      const sharePct=totalRevisions>0?((count/totalRevisions)*100).toFixed(1):"0.0";
+      const barPct=Math.min(100,(count/maxRevisions)*100);
+      return `
+        <div class="stat-row">
+          <div class="stat-head">
+            <span>${safe(subject)}</span>
+            <span><b>${fmt(count)}</b> ${count===1?'Revision':'Revisions'} <span class="muted">(${sharePct}%)</span></span>
+          </div>
+          <div class="stat-bar rev-bar"><i style="width:${barPct}%"></i></div>
+        </div>
+      `;
     }).join("");
   }
 }
@@ -810,6 +889,7 @@ function load(){
   renderLog();
   renderHistory();
   renderSubjectTotals();
+  renderRevisionTotals();
   renderIITRewards(d.rank);
 }
 
@@ -892,9 +972,24 @@ function removeEntry(id){
 }
 
 function exportData(){
-  const b=new Blob([JSON.stringify({version:1,exported_at:new Date().toISOString(),entries:entries(),snapshots:snaps(),revision:revData(),mistakes:mistakesData(),freezes:freezeData()},null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");
-  a.href=u;a.download="gate-da-tracker-backup.json";a.click();URL.revokeObjectURL(u);
-  toast("Backup exported.");
+  const normalizedRev = getNormalizedRevisionData();
+  const summaryCounts = calculateRevisionCounts();
+  const b=new Blob([JSON.stringify({
+    version: 2,
+    exported_at: new Date().toISOString(),
+    entries: entries(),
+    snapshots: snaps(),
+    revision: normalizedRev,
+    revision_totals_by_subject: summaryCounts,
+    mistakes: mistakesData(),
+    freezes: freezeData()
+  }, null, 2)], {type: "application/json"});
+  const u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u;
+  a.download="gate-da-tracker-backup.json";
+  a.click();
+  URL.revokeObjectURL(u);
+  toast("Backup exported with named subject revisions.");
 }
 
 function importData(){$("importFile").click()}
