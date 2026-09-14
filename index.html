@@ -192,7 +192,10 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .timer-pill{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#151e2c;border:1px solid #263348;color:#94a3b8;cursor:pointer}
 .timer-pill.active{background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;border-color:#7c5cff}
 
-/* Competition Comparison Cards */
+/* Competition Comparison Cards & Custom Parameters Controls */
+.sim-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:center;background:#090e17;border:1px solid #202d40;border-radius:14px;padding:12px 16px;margin-bottom:14px}
+.sim-field{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.sim-field input{width:70px;padding:6px 10px;text-align:center}
 .comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
 .comp-card{background:#0c121c;border:1px solid #1f2b3e;border-radius:14px;padding:14px;position:relative}
 .comp-card.you{border-color:#7c5cff;background:linear-gradient(135deg,#161336,#0c131d)}
@@ -250,6 +253,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .error-form{grid-template-columns:1fr 1fr}
  .timer-container{grid-template-columns:1fr}
  .timer-actions{justify-content:flex-start}
+ .sim-controls{grid-template-columns:1fr}
  .comp-grid{grid-template-columns:1fr}
 }
 @media(max-width:768px){
@@ -389,13 +393,28 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   </div>
  </div>
 
- <!-- Multi-Competitor Trajectory & Live Race Chart -->
+ <!-- Multi-Competitor Trajectory & Live Race Chart with Custom Simulation Parameters -->
  <div class="card panel8">
   <div class="title-row">
     <div>
       <h2>🏁 Rank Race & Competition Trajectory</h2>
-      <p>Compare your actual rank trajectory against standard aspirant benchmarks.</p>
+      <p>Customize rival pace benchmarks to simulate realistic GATE competition.</p>
     </div>
+  </div>
+
+  <!-- Custom Simulation Parameters Controls -->
+  <div class="sim-controls">
+    <div class="sim-field">
+      <label for="simRival1Input">🎯 Noob Looser Aniket:</label>
+      <input id="simRival1Input" type="number" min="1" max="100" value="15" onchange="updateSimulationParameters()">
+      <span>Qs/day</span>
+    </div>
+    <div class="sim-field">
+      <label for="simRival2Input">⚡ Dr. Aniket:</label>
+      <input id="simRival2Input" type="number" min="1" max="100" value="22" onchange="updateSimulationParameters()">
+      <span>Qs/day</span>
+    </div>
+    <button class="btn secondary" onclick="resetSimulationParameters()" style="padding:6px 12px;font-size:12px">Reset Defaults</button>
   </div>
   
   <div class="comp-grid">
@@ -405,12 +424,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
       <div class="comp-meta" id="compYouMeta">Total: 0 Qs</div>
     </div>
     <div class="comp-card target">
-      <div class="comp-tag">Aspirant A (15 Qs/day)</div>
+      <div class="comp-tag" id="compTargetTag">Noob Looser Aniket (15 Qs/day)</div>
       <div class="comp-rank" id="compTargetRank">—</div>
       <div class="comp-meta" id="compTargetMeta">15 Q/day + 2 Revs</div>
     </div>
     <div class="comp-card apex">
-      <div class="comp-tag">Apex Rival (22 Qs/day)</div>
+      <div class="comp-tag" id="compApexTag">Dr. Aniket (22 Qs/day)</div>
       <div class="comp-rank" id="compApexRank">—</div>
       <div class="comp-meta" id="compApexMeta">22 Q/day + 2 Revs</div>
     </div>
@@ -544,7 +563,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url", SIM_KEY="gate_da_sim_params";
 const MAX_FREEZES_PER_MONTH = 2;
 
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
@@ -559,6 +578,8 @@ const getDailyGoalTarget=()=>Number(read(GOAL_KEY, 25));
 const saveDailyGoalTarget=t=>localStorage.setItem(GOAL_KEY, JSON.stringify(t));
 const getWebhookUrl=()=>read(WEBHOOK_KEY, "");
 const saveWebhookUrl=u=>localStorage.setItem(WEBHOOK_KEY, JSON.stringify(u));
+const getSimParams=()=>read(SIM_KEY, { rival1: 15, rival2: 22 });
+const saveSimParams=p=>localStorage.setItem(SIM_KEY, JSON.stringify(p));
 
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
@@ -597,6 +618,7 @@ function buildPayloadObject(){
     entries: entries(),
     snapshots: snaps(),
     daily_goal: getDailyGoalTarget(),
+    simulation_params: getSimParams(),
     revision: getNormalizedRevisionData(),
     revision_totals_by_subject: calculateRevisionCounts(),
     mistakes: mistakesData(),
@@ -676,6 +698,26 @@ function copyBackupJson(){
   }).catch(()=>{
     toast("Could not copy automatically. Use Export Data.");
   });
+}
+
+/* Simulation Parameters Logic */
+function updateSimulationParameters(){
+  const r1 = Math.max(1, Number($("simRival1Input")?.value) || 15);
+  const r2 = Math.max(1, Number($("simRival2Input")?.value) || 22);
+  saveSimParams({ rival1: r1, rival2: r2 });
+  toast(`Simulation parameters updated: ${r1} Qs & ${r2} Qs per day.`);
+  load();
+  triggerAutoSync();
+}
+
+function resetSimulationParameters(){
+  const defaults = { rival1: 15, rival2: 22 };
+  saveSimParams(defaults);
+  if($("simRival1Input")) $("simRival1Input").value = defaults.rival1;
+  if($("simRival2Input")) $("simRival2Input").value = defaults.rival2;
+  toast("Simulation parameters reset to default 15 Q & 22 Q.");
+  load();
+  triggerAutoSync();
 }
 
 /* Stopwatch & Pomodoro Logic */
@@ -885,10 +927,8 @@ function toggleStreakFreezeToday(){
   triggerAutoSync();
 }
 
-/* Competitor Benchmark Simulation Logic */
-// Model an aspirant solving Q questions per day with balanced difficulty (Easy 20%, Med 40%, Hard 25%, PYQ 15%)
 function getSimulatedPointsForDay(qPerDay){
-  const avgDiffMultiplier = (0.20 * 0.75) + (0.40 * 1.0) + (0.25 * 1.35) + (0.15 * 1.50); // ~1.1125
+  const avgDiffMultiplier = (0.20 * 0.75) + (0.40 * 1.0) + (0.25 * 1.35) + (0.15 * 1.50);
   return qPerDay * avgDiffMultiplier;
 }
 
@@ -898,6 +938,7 @@ function dashboard(){
   const rd=getNormalizedRevisionData();
   const mList=mistakesData();
   const freezes=freezeData();
+  const simParams=getSimParams();
   const st=new Date(config.start_date+"T00:00:00"), now=new Date(t+"T00:00:00"), en=new Date(config.end_date+"T00:00:00");
   const elapsed=Math.max(1,Math.floor((Math.min(now,en)-st)/86400000)+1);
 
@@ -913,12 +954,14 @@ function dashboard(){
   sn[t]={rank:currentRank,total_questions:q,points:p};
   saveSnaps(sn);
 
-  // Compute Simulated Competitor Cumulative History across elapsed timeline
+  // Dynamic simulation using custom parameters
   const competitorHistory = [];
   let comp15Points = 0;
   let comp22Points = 0;
-  const ptsPerDay15 = getSimulatedPointsForDay(15);
-  const ptsPerDay22 = getSimulatedPointsForDay(22);
+  const r1Pace = simParams.rival1 || 15;
+  const r2Pace = simParams.rival2 || 22;
+  const ptsPerDay15 = getSimulatedPointsForDay(r1Pace);
+  const ptsPerDay22 = getSimulatedPointsForDay(r2Pace);
 
   for(let i=0; i<elapsed; i++){
     const d=new Date(st);
@@ -964,6 +1007,8 @@ function dashboard(){
     competitorHistory,
     latestComp15,
     latestComp22,
+    r1Pace,
+    r2Pace,
     elapsedDays: elapsed,
     subjects:Object.keys(config.subjects).map(subject=>({subject,q:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.questions,0),p:es.filter(x=>x.subject===subject).reduce((a,x)=>a+ +x.points,0)})),
     diff:Object.keys(config.difficulty).map(difficulty=>({difficulty,q:es.filter(x=>x.difficulty===difficulty).reduce((a,x)=>a+ +x.questions,0)}))
@@ -1221,13 +1266,20 @@ function renderCompetitionCards(d){
   if($("compYouRank")) $("compYouRank").textContent = fmt(d.rank);
   if($("compYouMeta")) $("compYouMeta").textContent = `${fmt(d.q)} Qs solved (${d.active} active days)`;
 
-  const q15Total = d.elapsedDays * 15;
+  const q15Total = d.elapsedDays * d.r1Pace;
+  if($("compTargetTag")) $("compTargetTag").textContent = `Noob Looser Aniket (${d.r1Pace} Qs/day)`;
   if($("compTargetRank")) $("compTargetRank").textContent = fmt(d.latestComp15);
-  if($("compTargetMeta")) $("compTargetMeta").textContent = `${fmt(q15Total)} Qs total (15 Q/day pace)`;
+  if($("compTargetMeta")) $("compTargetMeta").textContent = `${fmt(q15Total)} Qs total (${d.r1Pace} Q/day pace)`;
 
-  const q22Total = d.elapsedDays * 22;
+  const q22Total = d.elapsedDays * d.r2Pace;
+  if($("compApexTag")) $("compApexTag").textContent = `Dr. Aniket (${d.r2Pace} Qs/day)`;
   if($("compApexRank")) $("compApexRank").textContent = fmt(d.latestComp22);
-  if($("compApexMeta")) $("compApexMeta").textContent = `${fmt(q22Total)} Qs total (22 Q/day pace)`;
+  if($("compApexMeta")) $("compApexMeta").textContent = `${fmt(q22Total)} Qs total (${d.r2Pace} Q/day pace)`;
+
+  const r1In = $("simRival1Input");
+  const r2In = $("simRival2Input");
+  if(r1In && Number(r1In.value) !== d.r1Pace) r1In.value = d.r1Pace;
+  if(r2In && Number(r2In.value) !== d.r2Pace) r2In.value = d.r2Pace;
 }
 
 function load(){
@@ -1288,7 +1340,6 @@ function renderCharts(d){
   if(rcEl){
     if(rankChart) rankChart.destroy();
     
-    // Multi-line chart comparing You, 15 Q/day, and 22 Q/day
     const labels = d.competitorHistory.map(x=>x.date);
     const userData = d.competitorHistory.map(x=>x.userRank);
     const comp15Data = d.competitorHistory.map(x=>x.rank15);
@@ -1310,7 +1361,7 @@ function renderCharts(d){
             pointRadius: 3
           },
           {
-            label:"Aspirant A (15 Q/day)",
+            label:`Noob Looser Aniket (${d.r1Pace} Q/day)`,
             data: comp15Data,
             borderColor:"#f39c12",
             borderDash: [5, 5],
@@ -1320,7 +1371,7 @@ function renderCharts(d){
             pointRadius: 0
           },
           {
-            label:"Apex Rival (22 Q/day)",
+            label:`Dr. Aniket (${d.r2Pace} Q/day)`,
             data: comp22Data,
             borderColor:"#23d5ab",
             borderDash: [3, 3],
@@ -1462,6 +1513,7 @@ function handleImport(e){
       save(x.entries);
       if(x.snapshots)saveSnaps(x.snapshots);
       if(x.daily_goal)saveDailyGoalTarget(x.daily_goal);
+      if(x.simulation_params)saveSimParams(x.simulation_params);
       if(x.revision)saveRev(x.revision);
       if(x.mistakes)saveMistakes(x.mistakes);
       if(x.freezes)saveFreezes(x.freezes);
@@ -1539,6 +1591,10 @@ function init(){
   
   const whInput = $("webhookUrlInput");
   if(whInput) whInput.value = getWebhookUrl();
+
+  const simParams = getSimParams();
+  if($("simRival1Input")) $("simRival1Input").value = simParams.rival1 || 15;
+  if($("simRival2Input")) $("simRival2Input").value = simParams.rival2 || 22;
 
   updateTimerDisplay();
   load();
