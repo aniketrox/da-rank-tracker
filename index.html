@@ -137,6 +137,8 @@ button,input,select,textarea{font:inherit}
 .badge.iit-badge b{color:var(--accent2)}
 .badge.streak-badge{border-color:#e67e22;background:linear-gradient(135deg,#2e1708aa,#19120caa);color:#ffbe76;font-weight:700}
 .badge.freeze-badge{border-color:#0284c7;background:linear-gradient(135deg,#0c2333aa,#0d1822aa);color:#bae6fd;font-weight:600}
+.badge.sync-badge{border-color:#164e63;background:linear-gradient(135deg,#082f49aa,#0f172aaa);color:#7dd3fc;font-weight:600}
+
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 .card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
 .kpi{grid-column:span 3;min-height:135px}
@@ -158,6 +160,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .btn.secondary{background:#1a2332;border:1px solid #2b364a}
 .btn.danger{background:#29141a;color:#ff9aa2}
 .btn.freeze-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:#f0f9ff}
+.btn.sync-btn{background:linear-gradient(135deg,#0284c7,#23d5ab);color:#061016}
 .chartbox{height:290px;position:relative}
 .table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table{width:100%;min-width:480px;border-collapse:collapse}
@@ -170,6 +173,24 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .muted{color:var(--muted)}
 .toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#172131;border:1px solid #344057;box-shadow:var(--shadow);display:none;z-index:9999}
 .empty{color:var(--muted);padding:20px;text-align:center}
+
+/* Daily Goal Bar Styles */
+.goal-card{background:linear-gradient(135deg,#131926,#0e1520);border:1px solid #28354c;border-radius:16px;padding:16px;margin-bottom:18px}
+.goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.goal-target-ctrl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.goal-target-ctrl input{width:70px;padding:6px 10px;text-align:center}
+.goal-bar-track{height:14px;background:#090d15;border-radius:99px;overflow:hidden;border:1px solid #202a3c;position:relative}
+.goal-bar-fill{height:100%;background:linear-gradient(90deg,#7c5cff,#38bdf8,#23d5ab);border-radius:99px;transition:width .3s cubic-bezier(0.4,0,0.2,1)}
+
+/* Focus Stopwatch / Pomodoro Widget */
+.timer-container{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;background:#090e17;border:1px solid #222d3e;border-radius:16px;padding:16px;margin-top:14px;align-items:center}
+.timer-display-box{display:flex;align-items:center;gap:16px}
+.timer-digits{font-family:"Space Grotesk",sans-serif;font-size:38px;font-weight:700;color:var(--text);letter-spacing:1px}
+.timer-meta small{display:block;color:var(--muted);font-size:11px}
+.timer-meta span{font-size:13px;font-weight:600;color:var(--accent2)}
+.timer-actions{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.timer-pill{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#151e2c;border:1px solid #263348;color:#94a3b8;cursor:pointer}
+.timer-pill.active{background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;border-color:#7c5cff}
 
 /* Revision Section */
 .revision-box{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -188,6 +209,9 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .tag-formula{background:#3a2f16;color:#fdd663;border:1px solid #5e4a1d}
 .tag-misread{background:#2b1d38;color:#d7aefb;border:1px solid #4a286a}
 .tag-time{background:#1d332d;color:#81c995;border:1px solid #285444}
+
+/* Webhook & Auto-Sync Card */
+.sync-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:10px}
 
 .extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
 .extra-card{background:linear-gradient(180deg,#111824,#0e141e);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
@@ -211,6 +235,8 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .panel8,.panel4,.panel6{grid-column:span 12}
  .extra-grid{grid-template-columns:1fr}
  .error-form{grid-template-columns:1fr 1fr}
+ .timer-container{grid-template-columns:1fr}
+ .timer-actions{justify-content:flex-start}
 }
 @media(max-width:768px){
  .app{padding:14px}
@@ -229,6 +255,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .chartbox{height:240px}
  .revision-box{grid-template-columns:1fr}
  .reward-item{grid-template-columns:95px 1fr}
+ .sync-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){
  .brand{align-items:flex-start}
@@ -236,6 +263,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .brand h1{font-size:18px}
  .top-actions{flex-direction:column}
  .top-actions .btn, .top-actions .badge{width:100%}
+ .timer-digits{font-size:30px}
 }
 </style>
 </head>
@@ -263,6 +291,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div><h1>Problem Solving Command Center</h1><small>GATE DA 2027 · 19 Aug 2026 → 18 Jan 2027</small></div>
  </div>
  <div class="top-actions">
+  <div class="badge sync-badge" id="topSyncBadge">☁️ Local Storage</div>
   <div class="badge streak-badge" id="topStreakTag">🔥 Streak: 0 Days</div>
   <div class="badge freeze-badge" id="topFreezeTag">🧊 Freezes: 2/2</div>
   <button class="btn freeze-btn" id="useFreezeBtn" onclick="toggleStreakFreezeToday()">🧊 Use Freeze Today</button>
@@ -292,13 +321,57 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div class="revision-box" id="revisionCards"></div>
  </div>
 
+ <!-- Log Problems + Daily Goal Bar + Focus Stopwatch / Pomodoro -->
  <div class="card panel12">
-  <div class="title-row"><div><h2>Log today's problems</h2><p>Choose subject, difficulty and quantity. The rank updates automatically.</p></div></div>
+  <div class="title-row">
+    <div>
+      <h2>Log today's problems & Focus Session</h2>
+      <p>Set a daily question target, track your pace with the stopwatch/timer, and update rank automatically.</p>
+    </div>
+  </div>
+
+  <!-- Daily Goal Bar Widget -->
+  <div class="goal-card">
+    <div class="goal-header">
+      <div>
+        <span style="font-weight:700;font-size:14px" id="goalSummaryText">🎯 Daily Goal: 0 / 25 Problems Solved (0%)</span>
+      </div>
+      <div class="goal-target-ctrl">
+        <label for="goalTargetInput">Set Target:</label>
+        <input id="goalTargetInput" type="number" min="3" max="200" value="25" onchange="updateDailyGoalTarget()">
+        <span class="muted">problems/day</span>
+      </div>
+    </div>
+    <div class="goal-bar-track">
+      <div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Problem Logging Form -->
   <div class="form">
    <select id="subject"></select>
    <select id="difficulty"></select>
    <input id="questions" type="number" min="1" placeholder="Problems">
    <button class="btn" onclick="addEntry()">+ Add problems</button>
+  </div>
+
+  <!-- Pomodoro / Solving Stopwatch Widget -->
+  <div class="timer-container">
+    <div class="timer-display-box">
+      <div class="timer-digits" id="timerDigits">00:00</div>
+      <div class="timer-meta">
+        <small id="timerModeLabel">STOPWATCH (PACE TRACKER)</small>
+        <span id="timerPaceFeedback">Avg Pace: — min / problem</span>
+      </div>
+    </div>
+    <div class="timer-actions">
+      <div style="display:flex;gap:6px;margin-right:6px">
+        <span class="timer-pill active" id="modeStopwatchBtn" onclick="setTimerMode('stopwatch')">⏱ Stopwatch</span>
+        <span class="timer-pill" id="modePomoBtn" onclick="setTimerMode('pomodoro')">🍅 25m Pomo</span>
+      </div>
+      <button class="btn" id="timerStartBtn" onclick="toggleTimer()" style="padding:8px 14px;font-size:12px">Start</button>
+      <button class="btn secondary" onclick="resetTimer()" style="padding:8px 12px;font-size:12px">Reset</button>
+    </div>
   </div>
  </div>
 
@@ -340,6 +413,27 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
       <tbody id="mistakeLog"></tbody>
     </table>
   </div>
+ </div>
+
+ <!-- Cloud Auto-Sync & Google Apps Script / Webhook Integration -->
+ <div class="card panel12">
+  <div class="title-row">
+    <div>
+      <h2>☁️ Cloud Auto-Sync (Google Drive / Sheets / Custom Webhook)</h2>
+      <p>Paste a Google Apps Script Web App URL, Make.com, or Zapier webhook to auto-backup data on every change.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn secondary" onclick="copyBackupJson()" style="padding:8px 14px;font-size:12px">📋 Copy JSON</button>
+      <button class="btn sync-btn" onclick="syncNow()" style="padding:8px 14px;font-size:12px">☁️ Sync Now</button>
+    </div>
+  </div>
+  <div class="sync-grid">
+    <input id="webhookUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec or Webhook Endpoint" onchange="saveWebhookConfig()">
+    <button class="btn secondary" onclick="saveWebhookConfig()">Save Webhook</button>
+  </div>
+  <small class="muted" style="display:block;margin-top:8px">
+    💡 <b>Tip:</b> Auto-sync triggers seamlessly whenever you log a problem, complete revision, log a mistake, or freeze a day.
+  </small>
  </div>
 
  <div class="card panel8">
@@ -411,7 +505,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url";
 const MAX_FREEZES_PER_MONTH = 2;
 
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
@@ -422,6 +516,10 @@ const entries=()=>read(KEY,[]), save=e=>localStorage.setItem(KEY,JSON.stringify(
 const revData=()=>read(REV_KEY,{}), saveRev=r=>localStorage.setItem(REV_KEY,JSON.stringify(r));
 const mistakesData=()=>read(ERR_KEY,[]), saveMistakes=m=>localStorage.setItem(ERR_KEY,JSON.stringify(m));
 const freezeData=()=>read(FREEZE_KEY,[]), saveFreezes=f=>localStorage.setItem(FREEZE_KEY,JSON.stringify(f));
+const getDailyGoalTarget=()=>Number(read(GOAL_KEY, 25));
+const saveDailyGoalTarget=t=>localStorage.setItem(GOAL_KEY, JSON.stringify(t));
+const getWebhookUrl=()=>read(WEBHOOK_KEY, "");
+const saveWebhookUrl=u=>localStorage.setItem(WEBHOOK_KEY, JSON.stringify(u));
 
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
@@ -452,6 +550,189 @@ const IIT_REWARDS=[
  {rank:150,  name:"IIT Bombay",tier:"Apex Milestone Target"}
 ];
 
+/* Webhook & Auto-Sync Engine */
+function buildPayloadObject(){
+  return {
+    version: 2,
+    sync_timestamp: new Date().toISOString(),
+    entries: entries(),
+    snapshots: snaps(),
+    daily_goal: getDailyGoalTarget(),
+    revision: getNormalizedRevisionData(),
+    revision_totals_by_subject: calculateRevisionCounts(),
+    mistakes: mistakesData(),
+    freezes: freezeData()
+  };
+}
+
+function updateSyncStatus(status, text){
+  const badge = $("topSyncBadge");
+  if(!badge) return;
+  if(status === "syncing"){
+    badge.textContent = "🔄 Syncing…";
+    badge.style.borderColor = "#f5a623";
+    badge.style.color = "#fcd34d";
+  } else if(status === "synced"){
+    badge.textContent = `☁️ Synced (${new Date().toLocaleTimeString("en-IN", {hour:"2-digit",minute:"2-digit"})})`;
+    badge.style.borderColor = "#23d5ab";
+    badge.style.color = "#23d5ab";
+  } else if(status === "error"){
+    badge.textContent = "⚠️ Sync Failed";
+    badge.style.borderColor = "#ff5f6d";
+    badge.style.color = "#ff9aa2";
+  } else {
+    badge.textContent = text || "☁️ Local Storage";
+    badge.style.borderColor = "#164e63";
+    badge.style.color = "#7dd3fc";
+  }
+}
+
+async function triggerAutoSync(silent = true){
+  const url = getWebhookUrl();
+  if(!url || !url.startsWith("http")){
+    updateSyncStatus("local", "☁️ Local Vault");
+    return;
+  }
+
+  updateSyncStatus("syncing");
+  try{
+    const payload = buildPayloadObject();
+    await fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    updateSyncStatus("synced");
+    if(!silent) toast("Cloud Auto-Sync completed!");
+  } catch(err){
+    console.error("Auto-sync error:", err);
+    updateSyncStatus("error");
+    if(!silent) toast("Sync failed. Check webhook endpoint.");
+  }
+}
+
+function saveWebhookConfig(){
+  const input = $("webhookUrlInput");
+  const val = input ? input.value.trim() : "";
+  saveWebhookUrl(val);
+  toast(val ? "Webhook URL saved! Auto-sync enabled." : "Webhook cleared. Running locally.");
+  triggerAutoSync(false);
+}
+
+function syncNow(){
+  const url = getWebhookUrl();
+  if(!url){
+    toast("Add your Google Apps Script or Webhook URL below first!");
+    $("webhookUrlInput")?.focus();
+    return;
+  }
+  triggerAutoSync(false);
+}
+
+function copyBackupJson(){
+  const payload = buildPayloadObject();
+  navigator.clipboard.writeText(JSON.stringify(payload, null, 2)).then(()=>{
+    toast("Full Backup JSON copied to clipboard!");
+  }).catch(()=>{
+    toast("Could not copy automatically. Use Export Data.");
+  });
+}
+
+/* Stopwatch & Pomodoro Logic */
+let timerInterval = null;
+let timerSeconds = 0;
+let isTimerRunning = false;
+let timerMode = "stopwatch";
+const POMO_DURATION = 25 * 60;
+
+function updateTimerDisplay(){
+  const d = $("timerDigits");
+  if(!d) return;
+  const mins = Math.floor(timerSeconds / 60);
+  const secs = timerSeconds % 60;
+  d.textContent = `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+}
+
+function setTimerMode(mode){
+  if(isTimerRunning) toggleTimer();
+  timerMode = mode;
+  $("modeStopwatchBtn")?.classList.toggle("active", mode==="stopwatch");
+  $("modePomoBtn")?.classList.toggle("active", mode==="pomodoro");
+  
+  if(mode === "pomodoro"){
+    timerSeconds = POMO_DURATION;
+    $("timerModeLabel").textContent = "POMODORO FOCUS SESSION";
+  } else {
+    timerSeconds = 0;
+    $("timerModeLabel").textContent = "STOPWATCH (PACE TRACKER)";
+  }
+  updateTimerDisplay();
+}
+
+function toggleTimer(){
+  const btn = $("timerStartBtn");
+  if(isTimerRunning){
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+    if(btn){
+      btn.textContent = "Start";
+      btn.style.background = "linear-gradient(135deg,#7c5cff,#5b42e7)";
+    }
+  } else {
+    isTimerRunning = true;
+    if(btn){
+      btn.textContent = "Pause";
+      btn.style.background = "linear-gradient(135deg,#e67e22,#d35400)";
+    }
+    timerInterval = setInterval(()=>{
+      if(timerMode === "stopwatch"){
+        timerSeconds++;
+        updateTimerDisplay();
+      } else {
+        if(timerSeconds > 0){
+          timerSeconds--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+          toast("🍅 Pomodoro Complete! Take a 5-minute break.");
+          if(btn) btn.textContent = "Start";
+        }
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer(){
+  if(isTimerRunning) toggleTimer();
+  timerSeconds = (timerMode === "pomodoro") ? POMO_DURATION : 0;
+  updateTimerDisplay();
+}
+
+/* Daily Goal Bar Logic */
+function updateDailyGoalTarget(){
+  const val = Number($("goalTargetInput")?.value) || 25;
+  saveDailyGoalTarget(Math.max(1, val));
+  toast(`Daily goal updated to ${val} problems!`);
+  load();
+}
+
+function renderDailyGoalBar(todayQ){
+  const target = getDailyGoalTarget();
+  const inputEl = $("goalTargetInput");
+  if(inputEl && Number(inputEl.value) !== target) inputEl.value = target;
+
+  const pct = Math.min(100, Math.round((todayQ / target) * 100));
+  const fillEl = $("goalBarFill");
+  const summEl = $("goalSummaryText");
+
+  if(fillEl) fillEl.style.width = pct + "%";
+  if(summEl){
+    summEl.innerHTML = `🎯 Daily Goal: <b>${fmt(todayQ)}</b> / ${fmt(target)} Problems Solved (${pct}%) ${pct>=100?'<span style="color:var(--accent2);margin-left:8px">🎉 Goal Achieved!</span>':''}`;
+  }
+}
+
 function pointsFor(s,d,q){const ws=Object.values(config.subjects),avg=ws.reduce((a,b)=>a+b,0)/ws.length;return q*(config.subjects[s]/avg)*config.difficulty[d]}
 function rank(points){return Math.max(1,Math.round(config.start_rank-(config.start_rank-1)*(1-Math.exp(-points/2600))))}
 function toast(m){const e=$("toast");if(!e)return;e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
@@ -466,7 +747,6 @@ function getDailyRevisionPair(dateStr){
   return [subList[idx1], subList[idx2]];
 }
 
-// Normalizes any format (named subject keys or legacy s1/s2) into named subject mapping
 function getNormalizedRevisionData(){
   const raw=revData();
   const normalized={};
@@ -475,7 +755,6 @@ function getNormalizedRevisionData(){
     normalized[dateStr]={};
     const [s1, s2]=getDailyRevisionPair(dateStr);
     
-    // Check named subject keys first, fall back to legacy s1/s2
     if(obj[s1]!==undefined) normalized[dateStr][s1]=Boolean(obj[s1]);
     else if(obj.s1!==undefined) normalized[dateStr][s1]=Boolean(obj.s1);
     else normalized[dateStr][s1]=false;
@@ -564,6 +843,7 @@ function toggleStreakFreezeToday(){
     toast("🧊 Streak freeze activated for today! Rank and streak protected.");
   }
   load();
+  triggerAutoSync();
 }
 
 function dashboard(){
@@ -671,6 +951,7 @@ function toggleRevision(subjectName){
   const isAllDone=Boolean(rd[t][s1] && rd[t][s2]);
   toast(isAllDone ? "Both revised! Rank preserved." : "Revision status updated.");
   load();
+  triggerAutoSync();
 }
 
 function addMistakeEntry(){
@@ -700,6 +981,7 @@ function addMistakeEntry(){
   $('errTakeaway').value="";
   toast("Mistake logged to Notebook.");
   load();
+  triggerAutoSync();
 }
 
 function removeMistakeEntry(id){
@@ -708,6 +990,7 @@ function removeMistakeEntry(id){
   saveMistakes(mList);
   toast("Mistake log removed.");
   load();
+  triggerAutoSync();
 }
 
 function renderMistakes(){
@@ -882,6 +1165,7 @@ function load(){
   if($("accuracySub")) $("accuracySub").textContent=`${fmt(d.mistakesCount)} recorded errors (${fmt(d.q)} clean solved)`;
   if($("days")) $("days").textContent=Math.max(0,Math.ceil((new Date(config.end_date)-new Date(today()))/86400000))+" days remaining";
   
+  renderDailyGoalBar(d.tq);
   renderRevisionBox(d);
   renderMistakes();
   renderSubjects(d);
@@ -958,9 +1242,18 @@ function addEntry(){
   if(!q||q<1){toast("Enter the number of problems.");return}
   const es=entries(),todayQuestions=es.filter(x=>x.entry_date===today()).reduce((a,x)=>a+ +x.questions,0);
   if(todayQuestions+q<3){toast(`You must solve at least 3 problems today. Add ${3-todayQuestions} more.`);return}
+  
+  if(timerSeconds > 0 && timerMode === "stopwatch"){
+    const avgPaceMinutes = (timerSeconds / 60 / q).toFixed(1);
+    const paceEl = $("timerPaceFeedback");
+    if(paceEl) paceEl.textContent = `Last Batch: ${avgPaceMinutes} min / question`;
+  }
+
   const e={id:Date.now(),entry_date:today(),subject:$('subject').value,difficulty:$('difficulty').value,questions:q,points:pointsFor($('subject').value,$('difficulty').value,q),created_at:new Date().toISOString()};
   es.push(e);save(es);$('questions').value="";
-  const d=dashboard();toast(`Added. Rank → ${fmt(d.rank)}`);load();
+  const d=dashboard();toast(`Added. Rank → ${fmt(d.rank)}`);
+  load();
+  triggerAutoSync();
 }
 
 function removeEntry(id){
@@ -969,27 +1262,18 @@ function removeEntry(id){
   closeHistoryDetails();
   toast("Entry deleted.");
   load();
+  triggerAutoSync();
 }
 
 function exportData(){
-  const normalizedRev = getNormalizedRevisionData();
-  const summaryCounts = calculateRevisionCounts();
-  const b=new Blob([JSON.stringify({
-    version: 2,
-    exported_at: new Date().toISOString(),
-    entries: entries(),
-    snapshots: snaps(),
-    revision: normalizedRev,
-    revision_totals_by_subject: summaryCounts,
-    mistakes: mistakesData(),
-    freezes: freezeData()
-  }, null, 2)], {type: "application/json"});
+  const payload = buildPayloadObject();
+  const b=new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
   const u=URL.createObjectURL(b), a=document.createElement("a");
   a.href=u;
   a.download="gate-da-tracker-backup.json";
   a.click();
   URL.revokeObjectURL(u);
-  toast("Backup exported with named subject revisions.");
+  toast("Backup exported.");
 }
 
 function importData(){$("importFile").click()}
@@ -1003,11 +1287,13 @@ function handleImport(e){
       if(!Array.isArray(x.entries))throw Error("Invalid backup file.");
       save(x.entries);
       if(x.snapshots)saveSnaps(x.snapshots);
+      if(x.daily_goal)saveDailyGoalTarget(x.daily_goal);
       if(x.revision)saveRev(x.revision);
       if(x.mistakes)saveMistakes(x.mistakes);
       if(x.freezes)saveFreezes(x.freezes);
       load();
       toast("Backup restored successfully.");
+      triggerAutoSync();
     }catch(err){toast(err.message)}
     e.target.value="";
   };
@@ -1076,6 +1362,11 @@ function init(){
   }
 
   if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  
+  const whInput = $("webhookUrlInput");
+  if(whInput) whInput.value = getWebhookUrl();
+
+  updateTimerDisplay();
   load();
   startLoadingSequence();
 }
