@@ -115,16 +115,9 @@ button,input,select,textarea{font:inherit}
   transition:width 0.15s ease-out;
 }
 
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-@keyframes spin-reverse{
-  to{transform:rotate(-360deg)}
-}
-@keyframes pulse-scale{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.06);box-shadow:0 0 45px rgba(35,213,171,0.55)}
-}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin-reverse{to{transform:rotate(-360deg)}}
+@keyframes pulse-scale{0%,100%{transform:scale(1)}50%{transform:scale(1.06);box-shadow:0 0 45px rgba(35,213,171,0.55)}}
 
 .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
@@ -217,14 +210,26 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .rev-btn{border:1px solid #2a384e;background:#131c2a;color:#f4f7fb;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:12px;transition:all .2s}
 .rev-btn.checked{background:#23d5ab;color:#061016;border-color:#23d5ab}
 
-/* Mistake Notebook & Accuracy Styles */
-.error-form{display:grid;grid-template-columns:1.2fr 1fr 1.6fr 1.6fr auto;gap:10px;margin-bottom:18px}
+/* Advanced Mistake Notebook with Calendar Date & Image Support */
+.error-form-adv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.error-form-adv input, .error-form-adv select{width:100%}
+.error-file-label{border:1px dashed #3a475d;background:#0d1420;border-radius:12px;padding:10px 14px;font-size:12px;color:#9faabe;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.error-file-label:hover{border-color:var(--accent)}
+.mistake-thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #374660;transition:transform .2s}
+.mistake-thumb:hover{transform:scale(1.12)}
+.calendar-ctrl{display:flex;align-items:center;gap:8px;background:#090e17;border:1px solid #253348;border-radius:12px;padding:4px 10px}
+.calendar-ctrl input[type="date"]{background:transparent;border:0;color:var(--text);padding:4px;font-size:13px;outline:none}
+.calendar-ctrl input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.9);cursor:pointer}
 .tag-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.3px}
 .tag-calc{background:#381e1e;color:#ff9aa2;border:1px solid #5a2626}
 .tag-concept{background:#1e2438;color:#8ab4f8;border:1px solid #28395e}
 .tag-formula{background:#3a2f16;color:#fdd663;border:1px solid #5e4a1d}
 .tag-misread{background:#2b1d38;color:#d7aefb;border:1px solid #4a286a}
 .tag-time{background:#1d332d;color:#81c995;border:1px solid #285444}
+
+/* Image Preview Lightbox Modal */
+#imgLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999999;place-items:center;padding:20px}
+#imgLightbox img{max-width:90vw;max-height:85vh;border-radius:14px;border:1px solid #3e4f6a;box-shadow:var(--shadow)}
 
 /* Webhook & Auto-Sync Card */
 .sync-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:10px}
@@ -250,7 +255,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .kpi{grid-column:span 6}
  .panel8,.panel4,.panel6{grid-column:span 12}
  .extra-grid{grid-template-columns:1fr}
- .error-form{grid-template-columns:1fr 1fr}
+ .error-form-adv{grid-template-columns:1fr}
  .timer-container{grid-template-columns:1fr}
  .timer-actions{justify-content:flex-start}
  .sim-controls{grid-template-columns:1fr}
@@ -268,8 +273,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .kpi .value{font-size:32px}
  .rank .value{font-size:38px}
  .form{grid-template-columns:1fr;gap:10px}
- .error-form{grid-template-columns:1fr}
- .form select, .form input, .form .btn, .error-form select, .error-form input, .error-form .btn{width:100%}
+ .form select, .form input, .form .btn{width:100%}
  .chartbox{height:260px}
  .revision-box{grid-template-columns:1fr}
  .reward-item{grid-template-columns:95px 1fr}
@@ -405,12 +409,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <!-- Custom Simulation Parameters Controls -->
   <div class="sim-controls">
     <div class="sim-field">
-      <label for="simRival1Input">🎯 Noob Looser Aniket:</label>
+      <label for="simRival1Input">🎯 Aspirant A:</label>
       <input id="simRival1Input" type="number" min="1" max="100" value="15" onchange="updateSimulationParameters()">
       <span>Qs/day</span>
     </div>
     <div class="sim-field">
-      <label for="simRival2Input">⚡ Dr. Aniket:</label>
+      <label for="simRival2Input">⚡ Apex Rival:</label>
       <input id="simRival2Input" type="number" min="1" max="100" value="22" onchange="updateSimulationParameters()">
       <span>Qs/day</span>
     </div>
@@ -424,12 +428,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
       <div class="comp-meta" id="compYouMeta">Total: 0 Qs</div>
     </div>
     <div class="comp-card target">
-      <div class="comp-tag" id="compTargetTag">Noob Looser Aniket (15 Qs/day)</div>
+      <div class="comp-tag" id="compTargetTag">Aspirant A (15 Qs/day)</div>
       <div class="comp-rank" id="compTargetRank">—</div>
       <div class="comp-meta" id="compTargetMeta">15 Q/day + 2 Revs</div>
     </div>
     <div class="comp-card apex">
-      <div class="comp-tag" id="compApexTag">Dr. Aniket (22 Qs/day)</div>
+      <div class="comp-tag" id="compApexTag">Apex Rival (22 Qs/day)</div>
       <div class="comp-rank" id="compApexRank">—</div>
       <div class="comp-meta" id="compApexMeta">22 Q/day + 2 Revs</div>
     </div>
@@ -443,27 +447,41 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div class="chartbox"><canvas id="difficultyChart"></canvas></div>
  </div>
 
- <!-- Accuracy & Mistake Notebook Card -->
+ <!-- Advanced Mistake Notebook Card (Calendar Date Selector & 4MB Images) -->
  <div class="card panel12">
   <div class="title-row">
     <div>
-      <h2>📓 Mistake Notebook & Error Tracker</h2>
-      <p>Log tricky questions, concept traps, and calculation slips to stop repeating errors.</p>
+      <h2>📓 Mistake Notebook & Error Vault</h2>
+      <p>Log mistakes with question screenshots (up to 4MB). Use the calendar picker to view any past date.</p>
     </div>
-    <div class="badge" id="errorCountBadge">0 Total Mistakes Logged</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="calendar-ctrl">
+        <span style="font-size:13px;color:var(--muted)">📅 Date:</span>
+        <input id="errCalendarInput" type="date" onchange="changeMistakeCalendarDate(this.value)">
+      </div>
+      <button class="btn secondary" onclick="setMistakeDateToday()" style="padding:6px 11px;font-size:12px">Today</button>
+      <button class="btn secondary" id="btnAllMistakes" onclick="toggleAllMistakesView()" style="padding:6px 11px;font-size:12px">Show All</button>
+      <div class="badge" id="errorCountBadge">0 Mistakes Today</div>
+    </div>
   </div>
-  <div class="error-form">
-   <select id="errSubject"></select>
-   <select id="errType">
-     <option value="Calculation Slip">Calculation Slip</option>
-     <option value="Concept Gap">Concept Gap</option>
-     <option value="Formula Forgot">Formula Forgot / Misapplied</option>
-     <option value="Question Misread">Question Misread / Trick Trap</option>
-     <option value="Time Pressure">Time Pressure / Guess</option>
-   </select>
-   <input id="errQuestion" type="text" placeholder="Question / Concept summary">
-   <input id="errTakeaway" type="text" placeholder="Key takeaway / Correct approach">
-   <button class="btn" onclick="addMistakeEntry()">+ Log Mistake</button>
+
+  <div class="error-form-adv">
+    <select id="errSubject"></select>
+    <select id="errType">
+      <option value="Calculation Slip">Calculation Slip</option>
+      <option value="Concept Gap">Concept Gap</option>
+      <option value="Formula Forgot">Formula Forgot / Misapplied</option>
+      <option value="Question Misread">Question Misread / Trick Trap</option>
+      <option value="Time Pressure">Time Pressure / Guess</option>
+    </select>
+    <input id="errQuestion" type="text" placeholder="Question / Concept summary">
+    <input id="errTakeaway" type="text" placeholder="Key takeaway / Solution approach">
+    <div class="error-file-label" onclick="$('errImageInput').click()">
+      <span id="errFileDisplay">📷 Attach Question Screenshot / Photo (Optional)</span>
+      <span class="muted" style="font-size:11px">Max 4MB</span>
+    </div>
+    <input id="errImageInput" type="file" accept="image/*" style="display:none" onchange="handleMistakeImageSelected(event)">
+    <button class="btn" onclick="addMistakeEntry()" style="grid-column:span 2">+ Log Error Entry</button>
   </div>
   
   <div class="table-responsive">
@@ -475,6 +493,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
           <th>Type of Error</th>
           <th>Question / Issue</th>
           <th>Key Takeaway / Fix</th>
+          <th>Photo / Proof</th>
           <th></th>
         </tr>
       </thead>
@@ -488,7 +507,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div class="title-row">
     <div>
       <h2>☁️ Cloud Auto-Sync (Google Drive / Sheets / Custom Webhook)</h2>
-      <p>Paste a Google Apps Script Web App URL, Make.com, or Zapier webhook to auto-backup data on every change.</p>
+      <p>Paste your Google Apps Script URL. Images are automatically extracted and stored in your Google Drive folder without duplicates.</p>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button class="btn secondary" onclick="copyBackupJson()" style="padding:8px 14px;font-size:12px">📋 Copy JSON</button>
@@ -559,6 +578,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   </div>
 </section>
 </div>
+
+<!-- Image Lightbox Modal -->
+<div id="imgLightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="Enlarged Error Screenshot">
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -583,6 +608,9 @@ const saveSimParams=p=>localStorage.setItem(SIM_KEY, JSON.stringify(p));
 
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+let activeMistakeFilterDate = today();
+let currentBase64Image = null;
 
 const IIT_REWARDS=[
  {rank:75000,name:"IIT Bhilai",tier:"Foundation IIT Target"},
@@ -613,7 +641,7 @@ const IIT_REWARDS=[
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
   return {
-    version: 2,
+    version: 3,
     sync_timestamp: new Date().toISOString(),
     entries: entries(),
     snapshots: snaps(),
@@ -665,7 +693,7 @@ async function triggerAutoSync(silent = true){
       body: JSON.stringify(payload)
     });
     updateSyncStatus("synced");
-    if(!silent) toast("Cloud Auto-Sync completed!");
+    if(!silent) toast("Cloud Auto-Sync completed! Photos & JSON updated.");
   } catch(err){
     console.error("Auto-sync error:", err);
     updateSyncStatus("error");
@@ -954,7 +982,6 @@ function dashboard(){
   sn[t]={rank:currentRank,total_questions:q,points:p};
   saveSnaps(sn);
 
-  // Dynamic simulation using custom parameters
   const competitorHistory = [];
   let comp15Points = 0;
   let comp22Points = 0;
@@ -1079,38 +1106,85 @@ function toggleRevision(subjectName){
   triggerAutoSync();
 }
 
+/* 4MB Image Selection & Compression Engine */
+function handleMistakeImageSelected(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  // Enforce 4 MB upload limit
+  if(file.size > 4 * 1024 * 1024){
+    toast("Image exceeds 4MB. Please attach a smaller file.");
+    e.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+      const MAX_DIM = 1400;
+      if (width > height && width > MAX_DIM) {
+        height = Math.round((height * MAX_DIM) / width);
+        width = MAX_DIM;
+      } else if (height > MAX_DIM) {
+        width = Math.round((width * MAX_DIM) / height);
+        height = MAX_DIM;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      currentBase64Image = canvas.toDataURL("image/jpeg", 0.82);
+      $("errFileDisplay").textContent = `📷 ${file.name.substring(0,22)}… (Ready)`;
+      toast("Screenshot loaded (up to 4MB supported)!");
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function addMistakeEntry(){
   const subj=$('errSubject').value;
   const type=$('errType').value;
   const qSummary=$('errQuestion').value.trim();
   const takeaway=$('errTakeaway').value.trim();
 
-  if(!qSummary){
-    toast("Enter a short summary of the mistake / problem.");
+  if(!qSummary && !currentBase64Image){
+    toast("Enter a question summary or attach an error screenshot.");
     return;
   }
 
   const mList=mistakesData();
   const entry={
-    id:Date.now(),
-    date:today(),
-    subject:subj,
-    type:type,
-    question:qSummary,
-    takeaway:takeaway || "Review fundamental concepts."
+    id: Date.now(),
+    date: today(),
+    subject: subj,
+    type: type,
+    question: qSummary || "Visual Problem Log (Check Image)",
+    takeaway: takeaway || "Review fundamental concepts.",
+    imageBase64: currentBase64Image || null,
+    driveFileUrl: null
   };
   mList.push(entry);
   saveMistakes(mList);
 
   $('errQuestion').value="";
   $('errTakeaway').value="";
-  toast("Mistake logged to Notebook.");
+  $('errImageInput').value="";
+  $('errFileDisplay').textContent="📷 Attach Question Screenshot / Photo (Optional)";
+  currentBase64Image = null;
+
+  activeMistakeFilterDate = today();
+  toast("Mistake logged to today's notebook.");
   load();
   triggerAutoSync();
 }
 
 function removeMistakeEntry(id){
-  if(!confirm("Delete this mistake log entry?")) return;
+  if(!confirm("Delete this mistake entry?")) return;
   const mList=mistakesData().filter(x=>x.id!==id);
   saveMistakes(mList);
   toast("Mistake log removed.");
@@ -1118,10 +1192,66 @@ function removeMistakeEntry(id){
   triggerAutoSync();
 }
 
+function openLightbox(src){
+  const lb = $("imgLightbox");
+  const img = $("lightboxImg");
+  if(lb && img){
+    img.src = src;
+    lb.style.display = "grid";
+  }
+}
+function closeLightbox(){
+  const lb = $("imgLightbox");
+  if(lb) lb.style.display = "none";
+}
+
+/* Calendar Date Selection Handlers */
+function changeMistakeCalendarDate(selectedDate){
+  if(!selectedDate) return;
+  activeMistakeFilterDate = selectedDate;
+  renderMistakes();
+}
+
+function setMistakeDateToday(){
+  activeMistakeFilterDate = today();
+  renderMistakes();
+}
+
+function toggleAllMistakesView(){
+  if(activeMistakeFilterDate === "ALL"){
+    activeMistakeFilterDate = today();
+  } else {
+    activeMistakeFilterDate = "ALL";
+  }
+  renderMistakes();
+}
+
 function renderMistakes(){
-  const mList=mistakesData().slice().sort((a,b)=>b.id-a.id);
+  const mList=mistakesData();
+  const t = today();
+
+  const calInput = $("errCalendarInput");
+  const btnAll = $("btnAllMistakes");
+
+  if(calInput && activeMistakeFilterDate !== "ALL"){
+    calInput.value = activeMistakeFilterDate;
+  }
+  if(btnAll){
+    btnAll.classList.toggle("sync-btn", activeMistakeFilterDate === "ALL");
+    btnAll.textContent = activeMistakeFilterDate === "ALL" ? "✓ Showing All" : "Show All";
+  }
+
+  // Filter list by selected calendar day or all
+  const filtered = (activeMistakeFilterDate === "ALL") 
+    ? mList.slice().sort((a,b)=>b.id-a.id)
+    : mList.filter(x=>x.date === activeMistakeFilterDate).sort((a,b)=>b.id-a.id);
+
   const badge=$("errorCountBadge");
-  if(badge) badge.textContent=`${mList.length} Total Mistakes Logged`;
+  if(badge){
+    badge.textContent = (activeMistakeFilterDate === t) 
+      ? `${filtered.length} Mistakes Today`
+      : `${filtered.length} Mistakes (${activeMistakeFilterDate === "ALL" ? 'All Time' : label(activeMistakeFilterDate)})`;
+  }
 
   const tagClassMap={
     "Calculation Slip":"tag-calc",
@@ -1133,8 +1263,12 @@ function renderMistakes(){
 
   const mLog=$("mistakeLog");
   if(!mLog) return;
-  mLog.innerHTML=mList.length ? mList.map(x=>{
+  mLog.innerHTML=filtered.length ? filtered.map(x=>{
     const tagClass=tagClassMap[x.type] || "tag-concept";
+    const imgHtml = x.imageBase64 
+      ? `<img src="${x.imageBase64}" class="mistake-thumb" title="Click to enlarge screenshot" onclick="openLightbox('${x.imageBase64}')">`
+      : (x.driveFileUrl ? `<a href="${x.driveFileUrl}" target="_blank" style="color:var(--accent2);font-size:11px">🔗 Drive Photo</a>` : `<span class="muted">—</span>`);
+
     return `
       <tr>
         <td style="white-space:nowrap">${label(x.date)}</td>
@@ -1142,10 +1276,11 @@ function renderMistakes(){
         <td><span class="tag-badge ${tagClass}">${safe(x.type)}</span></td>
         <td>${safe(x.question)}</td>
         <td style="color:#b9c3d4">${safe(x.takeaway)}</td>
+        <td>${imgHtml}</td>
         <td><button class="btn danger" style="padding:4px 8px;font-size:11px" onclick="removeMistakeEntry(${x.id})">×</button></td>
       </tr>
     `;
-  }).join("") : `<tr><td colspan="6" class="empty">No mistakes logged yet. Keep practicing with clean accuracy!</td></tr>`;
+  }).join("") : `<tr><td colspan="7" class="empty">No mistakes logged for ${activeMistakeFilterDate === "ALL" ? 'any date' : label(activeMistakeFilterDate)}. Select another calendar date.</td></tr>`;
 }
 
 function renderSubjectTotals(){
@@ -1267,12 +1402,12 @@ function renderCompetitionCards(d){
   if($("compYouMeta")) $("compYouMeta").textContent = `${fmt(d.q)} Qs solved (${d.active} active days)`;
 
   const q15Total = d.elapsedDays * d.r1Pace;
-  if($("compTargetTag")) $("compTargetTag").textContent = `Noob Looser Aniket (${d.r1Pace} Qs/day)`;
+  if($("compTargetTag")) $("compTargetTag").textContent = `Aspirant A (${d.r1Pace} Qs/day)`;
   if($("compTargetRank")) $("compTargetRank").textContent = fmt(d.latestComp15);
   if($("compTargetMeta")) $("compTargetMeta").textContent = `${fmt(q15Total)} Qs total (${d.r1Pace} Q/day pace)`;
 
   const q22Total = d.elapsedDays * d.r2Pace;
-  if($("compApexTag")) $("compApexTag").textContent = `Dr. Aniket (${d.r2Pace} Qs/day)`;
+  if($("compApexTag")) $("compApexTag").textContent = `Apex Rival (${d.r2Pace} Qs/day)`;
   if($("compApexRank")) $("compApexRank").textContent = fmt(d.latestComp22);
   if($("compApexMeta")) $("compApexMeta").textContent = `${fmt(q22Total)} Qs total (${d.r2Pace} Q/day pace)`;
 
@@ -1361,7 +1496,7 @@ function renderCharts(d){
             pointRadius: 3
           },
           {
-            label:`Noob Looser Aniket (${d.r1Pace} Q/day)`,
+            label:`Aspirant A (${d.r1Pace} Q/day)`,
             data: comp15Data,
             borderColor:"#f39c12",
             borderDash: [5, 5],
@@ -1371,7 +1506,7 @@ function renderCharts(d){
             pointRadius: 0
           },
           {
-            label:`Dr. Aniket (${d.r2Pace} Q/day)`,
+            label:`Apex Rival (${d.r2Pace} Q/day)`,
             data: comp22Data,
             borderColor:"#23d5ab",
             borderDash: [3, 3],
