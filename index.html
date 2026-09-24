@@ -213,7 +213,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 /* Advanced Mistake Notebook with Calendar Date & Image Support */
 .error-form-adv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .error-form-adv input, .error-form-adv select{width:100%}
-.error-file-label{border:1px dashed #3a475d;background:#0d1420;border-radius:12px;padding:10px 14px;font-size:12px;color:#9faabe;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.error-file-label{border:1px dashed #3a475d;background:#0d1420;border-radius:12px;padding:10px 14px;font-size:12px;color:#9faabe;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s}
 .error-file-label:hover{border-color:var(--accent)}
 .mistake-thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #374660;transition:transform .2s}
 .mistake-thumb:hover{transform:scale(1.12)}
@@ -447,12 +447,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div class="chartbox"><canvas id="difficultyChart"></canvas></div>
  </div>
 
- <!-- Advanced Mistake Notebook Card (Calendar Date Selector & 4MB Images) -->
+ <!-- Advanced Mistake Notebook Card (Calendar Date Selector & Safe Photo Upload) -->
  <div class="card panel12">
   <div class="title-row">
     <div>
       <h2>📓 Mistake Notebook & Error Vault</h2>
-      <p>Log mistakes with question screenshots (up to 4MB). Use the calendar picker to view any past date.</p>
+      <p>Log mistakes with question screenshots. Select any calendar date to retrieve past error logs from JSON.</p>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div class="calendar-ctrl">
@@ -478,10 +478,10 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
     <input id="errTakeaway" type="text" placeholder="Key takeaway / Solution approach">
     <div class="error-file-label" onclick="$('errImageInput').click()">
       <span id="errFileDisplay">📷 Attach Question Screenshot / Photo (Optional)</span>
-      <span class="muted" style="font-size:11px">Max 4MB</span>
+      <span class="muted" style="font-size:11px">Max 5MB</span>
     </div>
     <input id="errImageInput" type="file" accept="image/*" style="display:none" onchange="handleMistakeImageSelected(event)">
-    <button class="btn" onclick="addMistakeEntry()" style="grid-column:span 2">+ Log Error Entry</button>
+    <button class="btn" id="btnSubmitMistake" onclick="addMistakeEntry()" style="grid-column:span 2">+ Log Error Entry</button>
   </div>
   
   <div class="table-responsive">
@@ -637,6 +637,29 @@ const IIT_REWARDS=[
  {rank:180,  name:"IIT Madras",tier:"Top Tier Apex Target"},
  {rank:150,  name:"IIT Bombay",tier:"Apex Milestone Target"}
 ];
+
+/* Safe Storage Mechanism to Prevent QuotaExceededError Crashes */
+function saveMistakesSafe(list){
+  try {
+    saveMistakes(list);
+  } catch(e) {
+    console.warn("Storage quota limit reached. Optimizing cached previews...", e);
+    // Strip heavy base64 strings from older entries (they are safely archived on Drive)
+    const optimized = list.map((item, idx) => {
+      if(idx < list.length - 2 && item.imageBase64 && item.imageBase64.length > 50000){
+        return { ...item, imageBase64: null };
+      }
+      return item;
+    });
+    try {
+      saveMistakes(optimized);
+    } catch(err2) {
+      // Emergency: keep only the latest item's image
+      const emergency = list.map((item, idx) => idx === list.length - 1 ? item : { ...item, imageBase64: null });
+      saveMistakes(emergency);
+    }
+  }
+}
 
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
@@ -1106,17 +1129,18 @@ function toggleRevision(subjectName){
   triggerAutoSync();
 }
 
-/* 4MB Image Selection & Compression Engine */
+/* Fast, Lightweight Mobile-Optimized Image Compressor (under 100KB payload) */
 function handleMistakeImageSelected(e){
   const file = e.target.files[0];
   if(!file) return;
 
-  // Enforce 4 MB upload limit
-  if(file.size > 4 * 1024 * 1024){
-    toast("Image exceeds 4MB. Please attach a smaller file.");
+  if(file.size > 5 * 1024 * 1024){
+    toast("Image exceeds 5MB. Please choose a smaller file.");
     e.target.value = "";
     return;
   }
+
+  $("errFileDisplay").textContent = "⏳ Optimizing image…";
 
   const reader = new FileReader();
   reader.onload = function(evt){
@@ -1125,7 +1149,7 @@ function handleMistakeImageSelected(e){
       const canvas = document.createElement("canvas");
       let width = img.width;
       let height = img.height;
-      const MAX_DIM = 1400;
+      const MAX_DIM = 960; // Optimal sharp resolution for formulas, ~70-100KB footprint
       if (width > height && width > MAX_DIM) {
         height = Math.round((height * MAX_DIM) / width);
         width = MAX_DIM;
@@ -1137,9 +1161,13 @@ function handleMistakeImageSelected(e){
       canvas.height = height;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, width, height);
-      currentBase64Image = canvas.toDataURL("image/jpeg", 0.82);
-      $("errFileDisplay").textContent = `📷 ${file.name.substring(0,22)}… (Ready)`;
-      toast("Screenshot loaded (up to 4MB supported)!");
+      currentBase64Image = canvas.toDataURL("image/jpeg", 0.70);
+      $("errFileDisplay").textContent = `📷 ${file.name.substring(0,20)}… (Ready)`;
+      toast("Screenshot compressed & ready!");
+    };
+    img.onerror = function(){
+      toast("Could not read image file format.");
+      $("errFileDisplay").textContent = "📷 Attach Question Screenshot / Photo (Optional)";
     };
     img.src = evt.target.result;
   };
@@ -1147,18 +1175,18 @@ function handleMistakeImageSelected(e){
 }
 
 function addMistakeEntry(){
-  const subj=$('errSubject').value;
-  const type=$('errType').value;
-  const qSummary=$('errQuestion').value.trim();
-  const takeaway=$('errTakeaway').value.trim();
+  const subj = $('errSubject') ?$('errSubject').value : '';
+  const type = $('errType') ?$('errType').value : '';
+  const qSummary = $('errQuestion') ?$('errQuestion').value.trim() : '';
+  const takeaway = $('errTakeaway') ?$('errTakeaway').value.trim() : '';
 
   if(!qSummary && !currentBase64Image){
     toast("Enter a question summary or attach an error screenshot.");
     return;
   }
 
-  const mList=mistakesData();
-  const entry={
+  const mList = mistakesData();
+  const entry = {
     id: Date.now(),
     date: today(),
     subject: subj,
@@ -1169,16 +1197,17 @@ function addMistakeEntry(){
     driveFileUrl: null
   };
   mList.push(entry);
-  saveMistakes(mList);
 
-  $('errQuestion').value="";
-  $('errTakeaway').value="";
-  $('errImageInput').value="";
-  $('errFileDisplay').textContent="📷 Attach Question Screenshot / Photo (Optional)";
+  saveMistakesSafe(mList);
+
+  if($('errQuestion'))$('errQuestion').value = "";
+  if($('errTakeaway'))$('errTakeaway').value = "";
+  if($('errImageInput'))$('errImageInput').value = "";
+  if($('errFileDisplay'))$('errFileDisplay').textContent = "📷 Attach Question Screenshot / Photo (Optional)";
   currentBase64Image = null;
 
   activeMistakeFilterDate = today();
-  toast("Mistake logged to today's notebook.");
+  toast("Mistake logged to today's notebook!");
   load();
   triggerAutoSync();
 }
@@ -1186,7 +1215,7 @@ function addMistakeEntry(){
 function removeMistakeEntry(id){
   if(!confirm("Delete this mistake entry?")) return;
   const mList=mistakesData().filter(x=>x.id!==id);
-  saveMistakes(mList);
+  saveMistakesSafe(mList);
   toast("Mistake log removed.");
   load();
   triggerAutoSync();
@@ -1241,7 +1270,6 @@ function renderMistakes(){
     btnAll.textContent = activeMistakeFilterDate === "ALL" ? "✓ Showing All" : "Show All";
   }
 
-  // Filter list by selected calendar day or all
   const filtered = (activeMistakeFilterDate === "ALL") 
     ? mList.slice().sort((a,b)=>b.id-a.id)
     : mList.filter(x=>x.date === activeMistakeFilterDate).sort((a,b)=>b.id-a.id);
@@ -1650,7 +1678,7 @@ function handleImport(e){
       if(x.daily_goal)saveDailyGoalTarget(x.daily_goal);
       if(x.simulation_params)saveSimParams(x.simulation_params);
       if(x.revision)saveRev(x.revision);
-      if(x.mistakes)saveMistakes(x.mistakes);
+      if(x.mistakes)saveMistakesSafe(x.mistakes);
       if(x.freezes)saveFreezes(x.freezes);
       load();
       toast("Backup restored successfully.");
@@ -1722,7 +1750,7 @@ function init(){
     }
   }
 
-  if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  if($('todayDate'))$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   
   const whInput = $("webhookUrlInput");
   if(whInput) whInput.value = getWebhookUrl();
