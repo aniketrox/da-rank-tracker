@@ -844,10 +844,11 @@ function resetSimulationParameters(){
 
 /* Enhanced Focus Stopwatch & Multi-Pomo Logic */
 let timerInterval = null;
-let timerSeconds = 0;
 let isTimerRunning = false;
 let currentTimerPresetKey = "stopwatch";
 let currentPresetTargetSeconds = 0;
+let lastTickTimestamp = null;
+let timerSeconds = 0;
 
 const PRESETS = {
   stopwatch: { name: "STOPWATCH (PACE & STUDY HOURS)", duration: 0 },
@@ -891,8 +892,14 @@ function setTimerPreset(presetKey, targetSec){
 function toggleTimer(){
   const btn = $("timerStartBtn");
   if(isTimerRunning){
+    // Pausing: capture any remaining fractional seconds
+    if(lastTickTimestamp){
+      const elapsedSec = Math.floor((Date.now() - lastTickTimestamp) / 1000);
+      if(elapsedSec > 0) addActiveStudySeconds(elapsedSec);
+    }
     clearInterval(timerInterval);
     isTimerRunning = false;
+    lastTickTimestamp = null;
     if(btn){
       btn.textContent = "Start";
       btn.style.background = "linear-gradient(135deg,#7c5cff,#5b42e7)";
@@ -900,32 +907,43 @@ function toggleTimer(){
     renderHistory();
     triggerAutoSync();
   } else {
+    // Starting: track exact real-world wall clock time
     isTimerRunning = true;
+    lastTickTimestamp = Date.now();
     if(btn){
       btn.textContent = "Pause";
       btn.style.background = "linear-gradient(135deg,#e67e22,#d35400)";
     }
     
     timerInterval = setInterval(() => {
-      addActiveStudySeconds(1);
+      const now = Date.now();
+      const deltaSec = Math.floor((now - lastTickTimestamp) / 1000);
+      
+      if(deltaSec >= 1){
+        lastTickTimestamp = now;
+        addActiveStudySeconds(deltaSec);
 
-      if(currentPresetTargetSeconds === 0){
-        timerSeconds++;
-        updateTimerDisplay();
-      } else {
-        if(timerSeconds > 0){
-          timerSeconds--;
+        if(currentPresetTargetSeconds === 0){
+          timerSeconds += deltaSec;
           updateTimerDisplay();
         } else {
-          clearInterval(timerInterval);
-          isTimerRunning = false;
-          toast("🔔 Session Complete! Study hours recorded.");
-          if(btn){
-            btn.textContent = "Start";
-            btn.style.background = "linear-gradient(135deg,#7c5cff,#5b42e7)";
+          if(timerSeconds > deltaSec){
+            timerSeconds -= deltaSec;
+            updateTimerDisplay();
+          } else {
+            timerSeconds = 0;
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            lastTickTimestamp = null;
+            toast("🔔 Session Complete! Study hours recorded.");
+            if(btn){
+              btn.textContent = "Start";
+              btn.style.background = "linear-gradient(135deg,#7c5cff,#5b42e7)";
+            }
+            renderHistory();
+            triggerAutoSync();
           }
-          renderHistory();
-          triggerAutoSync();
         }
       }
     }, 1000);
