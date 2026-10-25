@@ -191,6 +191,23 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .timer-pill.active{background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;border-color:#7c5cff}
 .timer-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
 
+/* Subject Inactivity & Recency Radar */
+.idle-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.idle-card{background:#0b111a;border:1px solid #1d2738;border-radius:14px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;transition:all .2s ease}
+.idle-card.idle-danger{border-color:#ff5f6d66;background:linear-gradient(135deg,#231318,#0f1622)}
+.idle-card.idle-warning{border-color:#f5a62366;background:linear-gradient(135deg,#1f170c,#0f1622)}
+.idle-card.idle-fresh{border-color:#23d5ab55;background:linear-gradient(135deg,#0c1d1a,#0f1622)}
+.idle-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.idle-sub-title{font-weight:700;font-size:14px}
+.idle-badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.idle-badge.danger{background:#3a181d;color:#ff9aa2;border:1px solid #5a2626}
+.idle-badge.warning{background:#382710;color:#ffbe76;border:1px solid #5e471d}
+.idle-badge.fresh{background:#11312b;color:#a7f3d0;border:1px solid #1d5749}
+.idle-stat-row{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.idle-stat-row b{font-family:"Space Grotesk";font-size:16px;color:var(--text)}
+.idle-action-btn{border:1px solid #28374d;background:#131c2a;color:#bae6fd;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;align-self:flex-start;transition:all .2s ease}
+.idle-action-btn:hover{background:#1d293d;border-color:var(--accent)}
+
 /* Competition Comparison Cards & Custom Parameters Controls */
 .sim-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:center;background:#090e17;border:1px solid #202d40;border-radius:14px;padding:12px 16px;margin-bottom:14px}
 .sim-field{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
@@ -257,6 +274,9 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .reward-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* Responsive Media Queries */
+@media(max-width:1150px){
+ .idle-grid{grid-template-columns:repeat(2,1fr)}
+}
 @media(max-width:1050px){
  .kpi{grid-column:span 6}
  .panel8,.panel4,.panel6{grid-column:span 12}
@@ -284,6 +304,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .reward-item{grid-template-columns:95px 1fr}
  .sync-grid{grid-template-columns:1fr}
  .timer-stats-badge{text-align:left;width:100%}
+ .idle-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){
  .brand{align-items:flex-start}
@@ -336,6 +357,18 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  <div class="card kpi streak-kpi"><div class="label">ACTIVE STREAK</div><div class="value" id="streakVal">0 Days</div><div class="sub" id="streakSub">Min 3 Qs + Revision or Freeze</div></div>
  <div class="card kpi"><div class="label">ACCURACY RATE</div><div class="value" id="accuracyVal">—%</div><div class="sub" id="accuracySub">0 recorded errors</div></div>
  <div class="card kpi"><div class="label">PROBLEMS SOLVED</div><div class="value" id="total">—</div><div class="sub" id="today">Today: —</div></div>
+
+ <!-- Subject Inactivity & Recency Radar (Idle Days Monitor) -->
+ <div class="card panel12">
+  <div class="title-row">
+    <div>
+      <h2>📡 Subject Recency Radar (Idle Days Monitor)</h2>
+      <p>Tracks how long each subject has been untouched. Subjects idle for $\ge 4$ days risk concept fade and need practice.</p>
+    </div>
+    <div class="badge" id="idleSummaryBadge">Checking Recency…</div>
+  </div>
+  <div class="idle-grid" id="idleSubjectGrid"></div>
+ </div>
 
  <!-- Daily Revision Target Section -->
  <div class="card panel12">
@@ -730,16 +763,125 @@ function renderStudyHoursDisplay(){
   if(el) el.textContent = sec >= 60 ? formatHoursMinutes(sec) : "0h 00m";
 }
 
+/* Subject Inactivity & Recency Radar Engine */
+function calculateSubjectInactivity(){
+  const es = entries();
+  const now = new Date(today() + "T00:00:00");
+  const stats = {};
+
+  Object.keys(config.subjects).forEach(s => {
+    // Filter all problems ever logged for this subject
+    const subjectEntries = es.filter(x => x.subject === s && x.entry_date);
+    if(subjectEntries.length === 0){
+      stats[s] = {
+        lastDate: null,
+        idleDays: 999,
+        status: "danger",
+        badgeText: "Never Practiced"
+      };
+    } else {
+      // Find the most recent date solved
+      const dates = subjectEntries.map(x => x.entry_date).sort().reverse();
+      const last = dates[0];
+      const lastD = new Date(last + "T00:00:00");
+      const diffDays = Math.max(0, Math.floor((now - lastD) / 86400000));
+
+      let status = "fresh";
+      let badgeText = `${diffDays === 0 ? "Today" : (diffDays === 1 ? "Yesterday" : diffDays + "d ago")}`;
+
+      if(diffDays >= 5){
+        status = "danger";
+        badgeText = `🚨 ${diffDays}d Idle`;
+      } else if(diffDays >= 2){
+        status = "warning";
+        badgeText = `⚠️ ${diffDays}d Idle`;
+      } else {
+        status = "fresh";
+        badgeText = `✓ Fresh (${badgeText})`;
+      }
+
+      stats[s] = {
+        lastDate: last,
+        idleDays: diffDays,
+        status: status,
+        badgeText: badgeText
+      };
+    }
+  });
+
+  return stats;
+}
+
+function selectSubjectForPractice(subjName){
+  const sel = $('subject');
+  if(sel){
+    sel.value = subjName;
+    sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    sel.focus();
+    toast(`Subject selected: ${subjName}`);
+  }
+}
+
+function renderSubjectInactivityRadar(){
+  const inact = calculateSubjectInactivity();
+  const grid = $("idleSubjectGrid");
+  const summaryBadge = $("idleSummaryBadge");
+  if(!grid) return;
+
+  // Sort descending: highest idle days first to flag rusted subjects immediately
+  const sorted = Object.keys(config.subjects).sort((a,b) => inact[b].idleDays - inact[a].idleDays);
+  
+  const severeCount = Object.values(inact).filter(x => x.idleDays >= 4).length;
+  if(summaryBadge){
+    if(severeCount > 0){
+      summaryBadge.textContent = `${severeCount} Subject${severeCount>1?'s':''} Need Attention (≥4d Idle)`;
+      summaryBadge.style.borderColor = "#ff5f6d";
+      summaryBadge.style.color = "#ff9aa2";
+    } else {
+      summaryBadge.textContent = "All Subjects Active & Fresh";
+      summaryBadge.style.borderColor = "#23d5ab";
+      summaryBadge.style.color = "#23d5ab";
+    }
+  }
+
+  grid.innerHTML = sorted.map(s => {
+    const info = inact[s];
+    const idleCardClass = info.status === "danger" ? "idle-danger" : (info.status === "warning" ? "idle-warning" : "idle-fresh");
+    const badgeClass = info.status;
+    const lastDisplay = info.lastDate ? label(info.lastDate) : "Never Solved";
+    const idleCountText = info.idleDays === 999 ? "∞ Days" : (info.idleDays === 0 ? "0 Days (Today)" : (info.idleDays === 1 ? "1 Day" : `${info.idleDays} Days`));
+
+    return `
+      <div class="idle-card ${idleCardClass}">
+        <div class="idle-top">
+          <div class="idle-sub-title">${safe(s)}</div>
+          <span class="idle-badge ${badgeClass}">${safe(info.badgeText)}</span>
+        </div>
+        <div class="idle-stat-row">
+          <span>Idle Duration:</span>
+          <b>${idleCountText}</b>
+        </div>
+        <div class="idle-stat-row">
+          <span>Last Solved:</span>
+          <span style="color:#b9c3d4">${safe(lastDisplay)}</span>
+        </div>
+        <button class="idle-action-btn" onclick="selectSubjectForPractice('${safe(s)}')">🎯 Practice Now</button>
+      </div>
+    `;
+  }).join("");
+}
+
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
   return {
-    version: 4,
+    version: 5,
     sync_timestamp: new Date().toISOString(),
     entries: entries(),
     snapshots: snaps(),
     daily_goal: getDailyGoalTarget(),
     daily_study_seconds: getStudyTimeData(),
     today_active_study: formatHoursMinutes(getTodayActiveStudySeconds()),
+    subject_inactivity: calculateSubjectInactivity(),
     simulation_params: getSimParams(),
     revision: getNormalizedRevisionData(),
     revision_totals_by_subject: calculateRevisionCounts(),
@@ -787,7 +929,7 @@ async function triggerAutoSync(silent = true){
       body: JSON.stringify(payload)
     });
     updateSyncStatus("synced");
-    if(!silent) toast("Cloud Auto-Sync completed! Photos, study hours & JSON updated.");
+    if(!silent) toast("Cloud Auto-Sync completed! Photos, study hours & recency updated.");
   } catch(err){
     console.error("Auto-sync error:", err);
     updateSyncStatus("error");
@@ -1289,10 +1431,10 @@ function handleMistakeImageSelected(e){
 }
 
 function addMistakeEntry(){
-  const subj = $('errSubject') ?$('errSubject').value : '';
-  const type = $('errType') ?$('errType').value : '';
-  const qSummary = $('errQuestion') ?$('errQuestion').value.trim() : '';
-  const takeaway = $('errTakeaway') ?$('errTakeaway').value.trim() : '';
+  const subj = $('errSubject') ? $('errSubject').value : '';
+  const type = $('errType') ? $('errType').value : '';
+  const qSummary = $('errQuestion') ? $('errQuestion').value.trim() : '';
+  const takeaway = $('errTakeaway') ? $('errTakeaway').value.trim() : '';
 
   if(!qSummary && !currentBase64Image){
     toast("Enter a question summary or attach an error screenshot.");
@@ -1314,10 +1456,10 @@ function addMistakeEntry(){
 
   saveMistakesSafe(mList);
 
-  if($('errQuestion'))$('errQuestion').value = "";
-  if($('errTakeaway'))$('errTakeaway').value = "";
-  if($('errImageInput'))$('errImageInput').value = "";
-  if($('errFileDisplay'))$('errFileDisplay').textContent = "📷 Attach Question Screenshot / Photo (Optional)";
+  if($('errQuestion')) $('errQuestion').value = "";
+  if($('errTakeaway')) $('errTakeaway').value = "";
+  if($('errImageInput')) $('errImageInput').value = "";
+  if($('errFileDisplay')) $('errFileDisplay').textContent = "📷 Attach Question Screenshot / Photo (Optional)";
   currentBase64Image = null;
 
   activeMistakeFilterDate = today();
@@ -1589,6 +1731,7 @@ function load(){
   
   renderDailyGoalBar(d.tq);
   renderStudyHoursDisplay();
+  renderSubjectInactivityRadar();
   renderRevisionBox(d);
   renderCompetitionCards(d);
   renderMistakes();
@@ -1725,7 +1868,6 @@ function renderHistory(){
   });
   
   const studyData = getStudyTimeData();
-  // Include dates that had study time recorded even if no problems were formally logged yet
   Object.keys(studyData).forEach(d => {
     if(!g[d] && studyData[d] >= 60){
       g[d] = { q: 0, p: 0, n: 0 };
@@ -1901,7 +2043,7 @@ function init(){
     }
   }
 
-  if($('todayDate'))$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   
   const whInput = $("webhookUrlInput");
   if(whInput) whInput.value = getWebhookUrl();
