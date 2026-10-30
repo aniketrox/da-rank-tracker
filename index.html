@@ -191,7 +191,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .timer-pill.active{background:linear-gradient(135deg,#7c5cff,#5b42e7);color:white;border-color:#7c5cff}
 .timer-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
 
-/* Subject Inactivity & Recency Radar */
+/* Subject Inactivity & Recency Radar with Daily Problem Quota */
 .idle-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .idle-card{background:#0b111a;border:1px solid #1d2738;border-radius:14px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;transition:all .2s ease}
 .idle-card.idle-danger{border-color:#ff5f6d66;background:linear-gradient(135deg,#231318,#0f1622)}
@@ -205,6 +205,15 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .idle-badge.fresh{background:#11312b;color:#a7f3d0;border:1px solid #1d5749}
 .idle-stat-row{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .idle-stat-row b{font-family:"Space Grotesk";font-size:16px;color:var(--text)}
+
+/* Target Quota Row Inside Idle Card */
+.idle-target-row{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#090d15;border:1px solid #1d2738;border-radius:10px;padding:6px 10px;margin-top:2px}
+.idle-target-row label{font-size:11px;color:var(--muted);font-weight:600}
+.idle-target-wrap{display:flex;align-items:center;gap:4px}
+.idle-target-input{width:50px!important;padding:4px 6px!important;font-size:12px!important;font-weight:700!important;text-align:center!important;border-radius:8px!important;background:#101724!important;border:1px solid #28374d!important;color:#38bdf8!important}
+.idle-target-status{font-size:11px;font-weight:700;color:var(--muted)}
+.idle-target-status.met{color:var(--accent2)}
+
 .idle-action-btn{border:1px solid #28374d;background:#131c2a;color:#bae6fd;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;align-self:flex-start;transition:all .2s ease}
 .idle-action-btn:hover{background:#1d293d;border-color:var(--accent)}
 
@@ -358,12 +367,12 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  <div class="card kpi"><div class="label">ACCURACY RATE</div><div class="value" id="accuracyVal">—%</div><div class="sub" id="accuracySub">0 recorded errors</div></div>
  <div class="card kpi"><div class="label">PROBLEMS SOLVED</div><div class="value" id="total">—</div><div class="sub" id="today">Today: —</div></div>
 
- <!-- Subject Inactivity & Recency Radar (Idle Days Monitor) -->
+ <!-- Subject Inactivity & Recency Radar with Daily Problem Quota Targets -->
  <div class="card panel12">
   <div class="title-row">
     <div>
-      <h2>📡 Subject Recency Radar (Idle Days Monitor)</h2>
-      <p>Tracks how long each subject has been untouched. Subjects idle for $\ge 4$ days risk concept fade and need practice.</p>
+      <h2>📡 Subject Recency Radar & Daily Target Quotas</h2>
+      <p>Tracks idle days and customizable daily problem goals for each subject. Manually tune quotas anytime.</p>
     </div>
     <div class="badge" id="idleSummaryBadge">Checking Recency…</div>
   </div>
@@ -662,7 +671,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url", SIM_KEY="gate_da_sim_params", STUDY_TIME_KEY="gate_da_study_time_data";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url", SIM_KEY="gate_da_sim_params", STUDY_TIME_KEY="gate_da_study_time_data", SUBJ_QUOTA_KEY="gate_da_subject_quotas";
 const MAX_FREEZES_PER_MONTH = 2;
 
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
@@ -681,6 +690,15 @@ const getSimParams=()=>read(SIM_KEY, { rival1: 15, rival2: 22 });
 const saveSimParams=p=>localStorage.setItem(SIM_KEY, JSON.stringify(p));
 const getStudyTimeData=()=>read(STUDY_TIME_KEY, {});
 const saveStudyTimeData=d=>localStorage.setItem(STUDY_TIME_KEY, JSON.stringify(d));
+
+/* Subject Daily Target Quotas Storage (Default: 5 Qs per subject) */
+const getSubjectQuotas=()=>{
+  const stored = read(SUBJ_QUOTA_KEY, {});
+  const defaults = {};
+  Object.keys(CONFIG.subjects).forEach(s => defaults[s] = 5);
+  return { ...defaults, ...stored };
+};
+const saveSubjectQuotas=q=>localStorage.setItem(SUBJ_QUOTA_KEY, JSON.stringify(q));
 
 const localDateKey=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}, today=()=>localDateKey(), label=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
@@ -763,24 +781,29 @@ function renderStudyHoursDisplay(){
   if(el) el.textContent = sec >= 60 ? formatHoursMinutes(sec) : "0h 00m";
 }
 
-/* Subject Inactivity & Recency Radar Engine */
+/* Subject Inactivity & Recency Radar Engine with Configurable Daily Quotas */
 function calculateSubjectInactivity(){
   const es = entries();
-  const now = new Date(today() + "T00:00:00");
+  const t = today();
+  const now = new Date(t + "T00:00:00");
   const stats = {};
+  const quotas = getSubjectQuotas();
 
   Object.keys(config.subjects).forEach(s => {
-    // Filter all problems ever logged for this subject
     const subjectEntries = es.filter(x => x.subject === s && x.entry_date);
+    const todaySolved = es.filter(x => x.subject === s && x.entry_date === t).reduce((sum, item) => sum + Number(item.questions), 0);
+    const targetQuota = Number(quotas[s] !== undefined ? quotas[s] : 5);
+
     if(subjectEntries.length === 0){
       stats[s] = {
         lastDate: null,
         idleDays: 999,
         status: "danger",
-        badgeText: "Never Practiced"
+        badgeText: "Never Practiced",
+        todaySolved,
+        targetQuota
       };
     } else {
-      // Find the most recent date solved
       const dates = subjectEntries.map(x => x.entry_date).sort().reverse();
       const last = dates[0];
       const lastD = new Date(last + "T00:00:00");
@@ -804,12 +827,24 @@ function calculateSubjectInactivity(){
         lastDate: last,
         idleDays: diffDays,
         status: status,
-        badgeText: badgeText
+        badgeText: badgeText,
+        todaySolved,
+        targetQuota
       };
     }
   });
 
   return stats;
+}
+
+function updateSubjectTargetQuota(subjName, val){
+  const num = Math.max(1, Number(val) || 5);
+  const quotas = getSubjectQuotas();
+  quotas[subjName] = num;
+  saveSubjectQuotas(quotas);
+  toast(`Daily target for ${subjName} set to ${num} Qs.`);
+  renderSubjectInactivityRadar();
+  triggerAutoSync();
 }
 
 function selectSubjectForPractice(subjName){
@@ -828,7 +863,6 @@ function renderSubjectInactivityRadar(){
   const summaryBadge = $("idleSummaryBadge");
   if(!grid) return;
 
-  // Sort descending: highest idle days first to flag rusted subjects immediately
   const sorted = Object.keys(config.subjects).sort((a,b) => inact[b].idleDays - inact[a].idleDays);
   
   const severeCount = Object.values(inact).filter(x => x.idleDays >= 4).length;
@@ -850,6 +884,7 @@ function renderSubjectInactivityRadar(){
     const badgeClass = info.status;
     const lastDisplay = info.lastDate ? label(info.lastDate) : "Never Solved";
     const idleCountText = info.idleDays === 999 ? "∞ Days" : (info.idleDays === 0 ? "0 Days (Today)" : (info.idleDays === 1 ? "1 Day" : `${info.idleDays} Days`));
+    const isTargetMet = info.todaySolved >= info.targetQuota;
 
     return `
       <div class="idle-card ${idleCardClass}">
@@ -865,6 +900,19 @@ function renderSubjectInactivityRadar(){
           <span>Last Solved:</span>
           <span style="color:#b9c3d4">${safe(lastDisplay)}</span>
         </div>
+
+        <!-- Customizable Daily Target Quota Widget -->
+        <div class="idle-target-row">
+          <label>Daily Target:</label>
+          <div class="idle-target-wrap">
+            <input class="idle-target-input" type="number" min="1" max="100" value="${info.targetQuota}" onchange="updateSubjectTargetQuota('${safe(s)}', this.value)">
+            <span style="font-size:11px;color:var(--muted)">Qs</span>
+          </div>
+          <span class="idle-target-status ${isTargetMet ? 'met' : ''}">
+            ${isTargetMet ? '✓ Met (' + info.todaySolved + ')' : info.todaySolved + '/' + info.targetQuota + ' done'}
+          </span>
+        </div>
+
         <button class="idle-action-btn" onclick="selectSubjectForPractice('${safe(s)}')">🎯 Practice Now</button>
       </div>
     `;
@@ -874,13 +922,14 @@ function renderSubjectInactivityRadar(){
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
   return {
-    version: 5,
+    version: 6,
     sync_timestamp: new Date().toISOString(),
     entries: entries(),
     snapshots: snaps(),
     daily_goal: getDailyGoalTarget(),
     daily_study_seconds: getStudyTimeData(),
     today_active_study: formatHoursMinutes(getTodayActiveStudySeconds()),
+    subject_quotas: getSubjectQuotas(),
     subject_inactivity: calculateSubjectInactivity(),
     simulation_params: getSimParams(),
     revision: getNormalizedRevisionData(),
@@ -1034,7 +1083,6 @@ function setTimerPreset(presetKey, targetSec){
 function toggleTimer(){
   const btn = $("timerStartBtn");
   if(isTimerRunning){
-    // Pausing: capture any remaining fractional seconds
     if(lastTickTimestamp){
       const elapsedSec = Math.floor((Date.now() - lastTickTimestamp) / 1000);
       if(elapsedSec > 0) addActiveStudySeconds(elapsedSec);
@@ -1049,7 +1097,6 @@ function toggleTimer(){
     renderHistory();
     triggerAutoSync();
   } else {
-    // Starting: track exact real-world wall clock time
     isTimerRunning = true;
     lastTickTimestamp = Date.now();
     if(btn){
@@ -1969,6 +2016,7 @@ function handleImport(e){
       if(x.snapshots)saveSnaps(x.snapshots);
       if(x.daily_goal)saveDailyGoalTarget(x.daily_goal);
       if(x.daily_study_seconds)saveStudyTimeData(x.daily_study_seconds);
+      if(x.subject_quotas)saveSubjectQuotas(x.subject_quotas);
       if(x.simulation_params)saveSimParams(x.simulation_params);
       if(x.revision)saveRev(x.revision);
       if(x.mistakes)saveMistakesSafe(x.mistakes);
@@ -2043,7 +2091,7 @@ function init(){
     }
   }
 
-  if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  if($('todayDate'))$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   
   const whInput = $("webhookUrlInput");
   if(whInput) whInput.value = getWebhookUrl();
