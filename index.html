@@ -154,6 +154,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .btn.danger{background:#29141a;color:#ff9aa2}
 .btn.freeze-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:#f0f9ff}
 .btn.sync-btn{background:linear-gradient(135deg,#0284c7,#23d5ab);color:#061016}
+.btn.exam-btn{background:linear-gradient(135deg,#f5a623,#ff5f6d);color:#061016;box-shadow:0 4px 20px rgba(245,166,35,.25)}
 .chartbox{height:320px;position:relative}
 .table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table{width:100%;min-width:480px;border-collapse:collapse}
@@ -164,7 +165,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .subject{margin:14px 0}
 .subject-head{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px}
 .muted{color:var(--muted)}
-.toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#172131;border:1px solid #344057;box-shadow:var(--shadow);display:none;z-index:9999}
+.toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#172131;border:1px solid #344057;box-shadow:var(--shadow);display:none;z-index:9999999}
 .empty{color:var(--muted);padding:20px;text-align:center}
 
 /* Daily Goal Bar Styles */
@@ -258,9 +259,40 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 .tag-formula{background:#3a2f16;color:#fdd663;border:1px solid #5e4a1d}
 .tag-misread{background:#2b1d38;color:#d7aefb;border:1px solid #4a286a}
 .tag-time{background:#1d332d;color:#81c995;border:1px solid #285444}
+.resolved-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#102926;color:#23d5ab;border:1px solid #1b4d46}
+.resolved-badge.zero{background:#151c29;color:#8f9bb0;border:1px solid #263044}
+.mark-pill{display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#251d47,#172338);color:#c4b5fd;border:1px solid #4c3b8f}
+.mark-pill.two-mark{background:linear-gradient(135deg,#332110,#241914);color:#fcd34d;border-color:#784b18}
+
+/* Create Exam Arena Modal Overlay */
+#examModal{display:none;position:fixed;inset:0;background:rgba(4,7,14,.94);z-index:999990;overflow-y:auto;padding:24px;backdrop-filter:blur(8px)}
+.exam-container{max-width:1100px;margin:0 auto;background:linear-gradient(180deg,#111824,#0d131d);border:1px solid #2d3b54;border-radius:24px;padding:26px;box-shadow:0 25px 70px rgba(0,0,0,.6)}
+.exam-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #202a3c;padding-bottom:16px;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.exam-timer-pill{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;padding:8px 16px;border-radius:12px;background:#0a0f18;border:1px solid #38bdf855;color:#38bdf8;letter-spacing:1px}
+.exam-nav-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;padding:12px;background:#090d16;border-radius:14px;border:1px solid #1d2638;max-height:130px;overflow-y:auto}
+.exam-q-num{width:34px;height:34px;border-radius:8px;border:1px solid #2a374e;background:#121a28;color:#9faabe;font-size:12px;font-weight:700;cursor:pointer;display:grid;place-items:center;transition:all .15s;position:relative}
+.exam-q-num:hover{border-color:var(--accent)}
+.exam-q-num.active{border-color:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,.3);color:white}
+.exam-q-num.solved{background:linear-gradient(135deg,#13362f,#0e2924);border-color:#23d5ab;color:#23d5ab}
+.exam-q-num.failed{background:linear-gradient(135deg,#38191e,#291317);border-color:#ff5f6d;color:#ff9aa2}
+.exam-stage{background:#090d16;border:1px solid #1e283b;border-radius:18px;padding:22px}
+.exam-meta-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #192233}
+.exam-image-box{margin:16px 0;text-align:center;background:#06090f;padding:14px;border-radius:14px;border:1px solid #1e293d}
+.exam-image-box img{max-width:100%;max-height:460px;border-radius:10px;cursor:zoom-in}
+.exam-solution-box{margin-top:16px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#102622,#0d1a24);border:1px solid #23d5ab55;display:none}
+.exam-controls{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px;flex-wrap:wrap}
+.exam-verdict-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+/* Scorecard Styling */
+.scorecard-hero{text-align:center;padding:24px 16px;background:linear-gradient(135deg,#161336,#0c1d24);border:1px solid #413477;border-radius:20px;margin-bottom:20px}
+.scorecard-big{font-family:"Space Grotesk",sans-serif;font-size:56px;font-weight:700;background:linear-gradient(90deg,#38bdf8,#23d5ab);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0}
+.scorecard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.scorecard-stat{background:#0d1420;border:1px solid #1e293b;border-radius:14px;padding:14px;text-align:center}
+.scorecard-stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:6px}
+.scorecard-stat b{font-family:"Space Grotesk",sans-serif;font-size:22px;color:var(--text)}
 
 /* Image Preview Lightbox Modal */
-#imgLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999999;place-items:center;padding:20px}
+#imgLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999999;place-items:center;padding:20px}
 #imgLightbox img{max-width:90vw;max-height:85vh;border-radius:14px;border:1px solid #3e4f6a;box-shadow:var(--shadow)}
 
 /* Webhook & Auto-Sync Card */
@@ -294,6 +326,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .timer-actions{margin-left:0;width:100%}
  .sim-controls{grid-template-columns:1fr}
  .comp-grid{grid-template-columns:1fr}
+ .scorecard-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:768px){
  .app{padding:14px}
@@ -314,6 +347,9 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
  .sync-grid{grid-template-columns:1fr}
  .timer-stats-badge{text-align:left;width:100%}
  .idle-grid{grid-template-columns:1fr}
+ #examModal{padding:10px}
+ .exam-container{padding:16px}
+ .scorecard-big{font-size:44px}
 }
 @media(max-width:480px){
  .brand{align-items:flex-start}
@@ -349,6 +385,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div><h1>Problem Solving Command Center</h1><small>GATE DA 2027 · 19 Aug 2026 → 18 Jan 2027</small></div>
  </div>
  <div class="top-actions">
+  <button class="btn exam-btn" onclick="openCreateExamModal()">📝 Create Exam (100 Marks)</button>
   <div class="badge sync-badge" id="topSyncBadge">☁️ Local Storage</div>
   <div class="badge streak-badge" id="topStreakTag">🔥 Streak: 0 Days</div>
   <div class="badge freeze-badge" id="topFreezeTag">🧊 Freezes: 2/2</div>
@@ -509,14 +546,15 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   <div class="chartbox"><canvas id="difficultyChart"></canvas></div>
  </div>
 
- <!-- Advanced Mistake Notebook Card (Calendar Date Selector & Safe Photo Upload) -->
+ <!-- Advanced Mistake Notebook Card (Calendar Date Selector, Safe Photo Upload, Resolution Counter & Create Exam Launcher) -->
  <div class="card panel12">
   <div class="title-row">
     <div>
       <h2>📓 Mistake Notebook & Error Vault</h2>
-      <p>Log mistakes with question screenshots. Select any calendar date to retrieve past error logs from JSON.</p>
+      <p>Log mistakes with question screenshots. Launch a 100-Mark (65 Qs) Mistake Exam to score yourself & track resolutions.</p>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn exam-btn" onclick="openCreateExamModal()" style="padding:7px 14px;font-size:12px">📝 Create Exam (100 Marks)</button>
       <div class="calendar-ctrl">
         <span style="font-size:13px;color:var(--muted)">📅 Date:</span>
         <input id="errCalendarInput" type="date" onchange="changeMistakeCalendarDate(this.value)">
@@ -556,6 +594,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
           <th>Question / Issue</th>
           <th>Key Takeaway / Fix</th>
           <th>Photo / Proof</th>
+          <th>Resolved</th>
           <th></th>
         </tr>
       </thead>
@@ -662,6 +701,29 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 </section>
 </div>
 
+<!-- Create Exam Arena Modal (65-Question / 100-Mark Mistake Vault Simulator) -->
+<div id="examModal">
+  <div class="exam-container">
+    <div class="exam-header">
+      <div>
+        <h2>📝 GATE DA Mistake Redemption Exam (100 Marks)</h2>
+        <p class="muted" style="margin:4px 0 0;font-size:13px" id="examHeaderSub">Generating multi-subject exam from your logged errors…</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="exam-timer-pill" id="examTimerDisplay">03:00:00</div>
+        <button class="btn sync-btn" id="examFinishBtn" onclick="finishExamSession()" style="padding:10px 16px">Finish & Save Results</button>
+        <button class="btn danger" onclick="closeExamModal()" style="padding:10px 14px">Exit</button>
+      </div>
+    </div>
+
+    <!-- Question Navigation Palette -->
+    <div class="exam-nav-strip" id="examNavPalette"></div>
+
+    <!-- Active Question Stage / Scorecard View -->
+    <div class="exam-stage" id="examStage"></div>
+  </div>
+</div>
+
 <!-- Image Lightbox Modal -->
 <div id="imgLightbox" onclick="closeLightbox()">
   <img id="lightboxImg" src="" alt="Enlarged Error Screenshot">
@@ -671,7 +733,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent)}
 
 <script>
 let config,rankChart,difficultyChart;
-const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url", SIM_KEY="gate_da_sim_params", STUDY_TIME_KEY="gate_da_study_time_data", SUBJ_QUOTA_KEY="gate_da_subject_quotas";
+const KEY="gate_da_entries", SNAP="gate_da_snapshots", REV_KEY="gate_da_revision_data", ERR_KEY="gate_da_mistakes_data", FREEZE_KEY="gate_da_freeze_data", GOAL_KEY="gate_da_daily_goal_target", WEBHOOK_KEY="gate_da_cloud_webhook_url", SIM_KEY="gate_da_sim_params", STUDY_TIME_KEY="gate_da_study_time_data", SUBJ_QUOTA_KEY="gate_da_subject_quotas", EXAM_HISTORY_KEY="gate_da_exam_history";
 const MAX_FREEZES_PER_MONTH = 2;
 
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("en-IN");
@@ -690,6 +752,8 @@ const getSimParams=()=>read(SIM_KEY, { rival1: 15, rival2: 22 });
 const saveSimParams=p=>localStorage.setItem(SIM_KEY, JSON.stringify(p));
 const getStudyTimeData=()=>read(STUDY_TIME_KEY, {});
 const saveStudyTimeData=d=>localStorage.setItem(STUDY_TIME_KEY, JSON.stringify(d));
+const getExamHistory=()=>read(EXAM_HISTORY_KEY, []);
+const saveExamHistory=h=>localStorage.setItem(EXAM_HISTORY_KEY, JSON.stringify(h));
 
 /* Subject Daily Target Quotas Storage (Default: 5 Qs per subject) */
 const getSubjectQuotas=()=>{
@@ -751,6 +815,377 @@ function saveMistakesSafe(list){
       saveMistakes(emergency);
     }
   }
+}
+
+/* =========================================================
+   CREATE EXAM ENGINE (65 Questions / 100 Marks GATE Pattern)
+   ========================================================= */
+let examQuestions = [];
+let examQuestionMarks = []; // Parallel array storing 1 or 2 marks for each question index
+let examCurrentIdx = 0;
+let examStatusMap = {}; // { idx: 'solved' | 'failed' }
+let examRevealMap = {}; // { idx: true }
+let examTimerInterval = null;
+let examSecondsLeft = 180 * 60; // 3 hours GATE duration
+let examLastTick = null;
+let isExamFinished = false;
+
+function buildBalancedExamDeck(allMistakes, targetCount = 65){
+  if(!allMistakes || allMistakes.length === 0) return [];
+  
+  const bySubject = {};
+  Object.keys(config.subjects).forEach(s => bySubject[s] = []);
+  allMistakes.forEach(m => {
+    const s = bySubject[m.subject] ? m.subject : Object.keys(config.subjects)[0];
+    bySubject[s].push(m);
+  });
+
+  Object.keys(bySubject).forEach(s => {
+    bySubject[s].sort((a, b) => {
+      const resA = Number(a.resolvedCount || 0);
+      const resB = Number(b.resolvedCount || 0);
+      if(resA !== resB) return resA - resB;
+      return Math.random() - 0.5;
+    });
+  });
+
+  const deck = [];
+  const subjectNames = Object.keys(bySubject);
+  let addedInPass = true;
+
+  while(deck.length < targetCount && addedInPass){
+    addedInPass = false;
+    for(const s of subjectNames){
+      if(deck.length >= targetCount) break;
+      if(bySubject[s].length > 0){
+        deck.push(bySubject[s].shift());
+        addedInPass = true;
+      }
+    }
+  }
+
+  return deck;
+}
+
+function assignGateMarks(deck){
+  // Official GATE pattern: 30 questions of 1 mark, 35 questions of 2 marks = 100 marks total
+  // If deck < 65, assign ~46% as 1-mark and ~54% as 2-mark
+  const total = deck.length;
+  const oneMarkCount = (total === 65) ? 30 : Math.floor(total * (30 / 65));
+  
+  return deck.map((_, idx) => (idx < oneMarkCount) ? 1 : 2);
+}
+
+function openCreateExamModal(){
+  const allMistakes = mistakesData();
+  if(allMistakes.length === 0){
+    toast("Your Mistake Notebook is empty! Log mistakes first to generate an exam.");
+    return;
+  }
+
+  examQuestions = buildBalancedExamDeck(allMistakes, 65);
+  examQuestionMarks = assignGateMarks(examQuestions);
+  examCurrentIdx = 0;
+  examStatusMap = {};
+  examRevealMap = {};
+  examSecondsLeft = 180 * 60;
+  isExamFinished = false;
+
+  const uniqueSubjectsCount = new Set(examQuestions.map(q => q.subject)).size;
+  const maxRawMarks = examQuestionMarks.reduce((a, b) => a + b, 0);
+  
+  $("examHeaderSub").textContent = `Loaded ${examQuestions.length} Qs across ${uniqueSubjectsCount} Subjects · Max Marks: ${maxRawMarks} (Scaled / 100)`;
+  $("examFinishBtn").style.display = "inline-block";
+  $("examNavPalette").style.display = "flex";
+
+  $("examModal").style.display = "block";
+  document.body.style.overflow = "hidden";
+
+  startExamTimer();
+  renderExamNavPalette();
+  renderExamQuestion();
+}
+
+function closeExamModal(){
+  if(examTimerInterval){
+    clearInterval(examTimerInterval);
+    examTimerInterval = null;
+  }
+  $("examModal").style.display = "none";
+  document.body.style.overflow = "auto";
+  load();
+}
+
+function startExamTimer(){
+  if(examTimerInterval) clearInterval(examTimerInterval);
+  examLastTick = Date.now();
+  updateExamTimerDisplay();
+
+  examTimerInterval = setInterval(() => {
+    const now = Date.now();
+    const delta = Math.floor((now - examLastTick) / 1000);
+    if(delta >= 1){
+      examLastTick = now;
+      examSecondsLeft = Math.max(0, examSecondsLeft - delta);
+      updateExamTimerDisplay();
+      if(examSecondsLeft === 0){
+        clearInterval(examTimerInterval);
+        toast("⏰ Time's up! Calculating your final score…");
+        finishExamSession();
+      }
+    }
+  }, 1000);
+}
+
+function updateExamTimerDisplay(){
+  const el = $("examTimerDisplay");
+  if(el) el.textContent = formatHMS(examSecondsLeft);
+}
+
+function jumpToExamQuestion(idx){
+  if(isExamFinished) return;
+  if(idx < 0 || idx >= examQuestions.length) return;
+  examCurrentIdx = idx;
+  renderExamNavPalette();
+  renderExamQuestion();
+}
+
+function renderExamNavPalette(){
+  const palette = $("examNavPalette");
+  if(!palette) return;
+  palette.innerHTML = examQuestions.map((q, idx) => {
+    const st = examStatusMap[idx] || "";
+    const activeCls = idx === examCurrentIdx ? "active" : "";
+    const m = examQuestionMarks[idx];
+    return `<button class="exam-q-num ${st} ${activeCls}" title="Q${idx+1} (${m} Mark${m>1?'s':''})" onclick="jumpToExamQuestion(${idx})">${idx + 1}</button>`;
+  }).join("");
+}
+
+function toggleExamSolutionReveal(){
+  examRevealMap[examCurrentIdx] = !examRevealMap[examCurrentIdx];
+  renderExamQuestion();
+}
+
+function markExamQuestionVerdict(verdict){
+  const q = examQuestions[examCurrentIdx];
+  if(!q) return;
+
+  const prevVerdict = examStatusMap[examCurrentIdx];
+  examStatusMap[examCurrentIdx] = verdict;
+
+  const mList = mistakesData();
+  const targetIdx = mList.findIndex(item => item.id === q.id);
+
+  if(targetIdx !== -1){
+    const currentResolved = Number(mList[targetIdx].resolvedCount || 0);
+    if(verdict === "solved" && prevVerdict !== "solved"){
+      mList[targetIdx].resolvedCount = currentResolved + 1;
+      mList[targetIdx].lastResolvedDate = today();
+      q.resolvedCount = mList[targetIdx].resolvedCount;
+      toast(`✓ Marked Resolved (+${examQuestionMarks[examCurrentIdx]} Marks)!`);
+    } else if(verdict === "failed" && prevVerdict === "solved"){
+      mList[targetIdx].resolvedCount = Math.max(0, currentResolved - 1);
+      q.resolvedCount = mList[targetIdx].resolvedCount;
+      toast("Marked for further review.");
+    } else if(verdict === "failed"){
+      toast("Flagged for further revision.");
+    }
+    saveMistakesSafe(mList);
+  }
+
+  renderExamNavPalette();
+  renderExamQuestion();
+
+  if(examCurrentIdx < examQuestions.length - 1){
+    setTimeout(() => {
+      jumpToExamQuestion(examCurrentIdx + 1);
+    }, 350);
+  }
+}
+
+function finishExamSession(){
+  if(isExamFinished) return;
+  isExamFinished = true;
+
+  if(examTimerInterval){
+    clearInterval(examTimerInterval);
+    examTimerInterval = null;
+  }
+
+  // Calculate Marks Breakdown (1-Mark & 2-Mark Questions)
+  let rawMarksEarned = 0;
+  let totalRawMarksPossible = 0;
+  let oneMarkSolved = 0, oneMarkTotal = 0;
+  let twoMarkSolved = 0, twoMarkTotal = 0;
+  let solvedCount = 0;
+  let failedCount = 0;
+
+  examQuestions.forEach((q, idx) => {
+    const weight = examQuestionMarks[idx];
+    const status = examStatusMap[idx];
+    totalRawMarksPossible += weight;
+
+    if(weight === 1) oneMarkTotal++;
+    else twoMarkTotal++;
+
+    if(status === "solved"){
+      solvedCount++;
+      rawMarksEarned += weight;
+      if(weight === 1) oneMarkSolved++;
+      else twoMarkSolved++;
+    } else if(status === "failed"){
+      failedCount++;
+    }
+  });
+
+  // Normalize out of 100 if user has < 65 mistakes in vault; exact raw marks if 65 questions
+  const marksOutOf100 = totalRawMarksPossible > 0 
+    ? Number(((rawMarksEarned / totalRawMarksPossible) * 100).toFixed(2))
+    : 0;
+
+  const elapsedSeconds = (180 * 60) - examSecondsLeft;
+  const timeSpentDisplay = elapsedSeconds >= 60 ? formatHoursMinutes(elapsedSeconds) : `${elapsedSeconds}s`;
+
+  // Save to exam history
+  const history = getExamHistory();
+  history.push({
+    id: Date.now(),
+    date: today(),
+    total_questions: examQuestions.length,
+    marks_out_of_100: marksOutOf100,
+    raw_marks_earned: rawMarksEarned,
+    raw_marks_total: totalRawMarksPossible,
+    one_mark_solved: `${oneMarkSolved}/${oneMarkTotal}`,
+    two_mark_solved: `${twoMarkSolved}/${twoMarkTotal}`,
+    resolved_count: solvedCount,
+    failed_count: failedCount,
+    time_spent: timeSpentDisplay
+  });
+  saveExamHistory(history);
+
+  // Render Final Scorecard Inside Modal
+  $("examFinishBtn").style.display = "none";
+  $("examNavPalette").style.display = "none";
+  $("examHeaderSub").textContent = "Exam Completed · Performance Report & Marks Breakdown";
+
+  const stage = $("examStage");
+  if(stage){
+    stage.innerHTML = `
+      <div class="scorecard-hero">
+        <div class="muted" style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">FINAL EXAM SCORE</div>
+        <div class="scorecard-big">${marksOutOf100} / 100</div>
+        <div style="font-size:14px;color:#b9c3d4">
+          Raw Marks: <b>${rawMarksEarned} / ${totalRawMarksPossible}</b> · Questions Solved: <b>${solvedCount} / ${examQuestions.length}</b>
+        </div>
+      </div>
+
+      <div class="scorecard-grid">
+        <div class="scorecard-stat">
+          <small>1-Mark Questions</small>
+          <b style="color:#c4b5fd">${oneMarkSolved} / ${oneMarkTotal}</b>
+          <div class="muted" style="font-size:11px;margin-top:4px">${oneMarkSolved * 1} Marks Earned</div>
+        </div>
+        <div class="scorecard-stat">
+          <small>2-Mark Questions</small>
+          <b style="color:#fcd34d">${twoMarkSolved} / ${twoMarkTotal}</b>
+          <div class="muted" style="font-size:11px;margin-top:4px">${twoMarkSolved * 2} Marks Earned</div>
+        </div>
+        <div class="scorecard-stat">
+          <small>Needs Practice / Unattempted</small>
+          <b style="color:#ff9aa2">${examQuestions.length - solvedCount}</b>
+          <div class="muted" style="font-size:11px;margin-top:4px">${failedCount} Flagged Wrong</div>
+        </div>
+        <div class="scorecard-stat">
+          <small>Time Taken</small>
+          <b style="color:#38bdf8">${timeSpentDisplay}</b>
+          <div class="muted" style="font-size:11px;margin-top:4px">Out of 3h 00m</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn sync-btn" onclick="closeExamModal()" style="padding:12px 28px;font-size:14px">✓ Done & Return to Command Center</button>
+      </div>
+    `;
+  }
+
+  toast(`🏆 Exam Finished! Score: ${marksOutOf100} / 100`);
+  triggerAutoSync();
+}
+
+function renderExamQuestion(){
+  const stage = $("examStage");
+  if(!stage || examQuestions.length === 0) return;
+
+  const q = examQuestions[examCurrentIdx];
+  const qMarks = examQuestionMarks[examCurrentIdx];
+  const resolvedTimes = Number(q.resolvedCount || 0);
+  const verdict = examStatusMap[examCurrentIdx] || null;
+  const isRevealed = Boolean(examRevealMap[examCurrentIdx]);
+
+  let imageHtml = "";
+  if(q.imageBase64){
+    imageHtml = `
+      <div class="exam-image-box">
+        <img src="${q.imageBase64}" alt="Mistake Screenshot" onclick="openLightbox('${q.imageBase64}')" title="Click to zoom full screen">
+        <div class="muted" style="font-size:11px;margin-top:6px">🔍 Click screenshot to zoom full screen</div>
+      </div>`;
+  } else if(q.driveFileUrl){
+    imageHtml = `
+      <div class="exam-image-box">
+        <p class="muted" style="margin:0 0 8px">Image stored on Google Drive:</p>
+        <a href="${safe(q.driveFileUrl)}" target="_blank" class="btn secondary" style="display:inline-block;text-decoration:none;font-size:12px">🔗 Open Drive Screenshot</a>
+      </div>`;
+  } else {
+    imageHtml = `<div class="exam-image-box" style="padding:24px"><span class="muted">No image attached to this mistake entry — solve from the prompt below.</span></div>`;
+  }
+
+  stage.innerHTML = `
+    <div class="exam-meta-bar">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#38bdf8">Question ${examCurrentIdx + 1} of ${examQuestions.length}</span>
+        <span class="mark-pill ${qMarks === 2 ? 'two-mark' : ''}">⭐ ${qMarks} Mark${qMarks > 1 ? 's' : ''}</span>
+        <span class="badge" style="padding:5px 10px;font-size:12px"><b>${safe(q.subject)}</b></span>
+        <span class="tag-badge tag-concept">${safe(q.type)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="resolved-badge ${resolvedTimes === 0 ? 'zero' : ''}">
+          ${resolvedTimes > 0 ? `✓ Resolved ${resolvedTimes}x previously` : 'Unresolved (0x)'}
+        </span>
+        ${verdict === 'solved' ? `<span class="tag-badge tag-time">✓ Solved (+${qMarks}M)</span>` : ''}
+        ${verdict === 'failed' ? '<span class="tag-badge tag-calc">✗ Needs Practice</span>' : ''}
+      </div>
+    </div>
+
+    <div style="font-size:16px;font-weight:600;line-height:1.5;margin-bottom:8px">
+      ${safe(q.question)}
+    </div>
+    <div class="muted" style="font-size:12px">Originally logged on ${label(q.date)}</div>
+
+    ${imageHtml}
+
+    <div style="margin-top:12px">
+      <button class="btn secondary" onclick="toggleExamSolutionReveal()" style="padding:8px 14px;font-size:12px">
+        ${isRevealed ? '🙈 Hide Key Takeaway / Fix' : '💡 Reveal Key Takeaway / Fix'}
+      </button>
+    </div>
+
+    <div class="exam-solution-box" style="display:${isRevealed ? 'block' : 'none'}">
+      <small style="color:var(--accent2);font-weight:700;letter-spacing:.5px;text-transform:uppercase">Key Takeaway & Solution Approach</small>
+      <div style="margin-top:6px;font-size:14px;line-height:1.5;color:#f4f7fb">${safe(q.takeaway)}</div>
+    </div>
+
+    <div class="exam-controls">
+      <div style="display:flex;gap:8px">
+        <button class="btn secondary" onclick="jumpToExamQuestion(${examCurrentIdx - 1})" ${examCurrentIdx === 0 ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''}>← Prev</button>
+        <button class="btn secondary" onclick="jumpToExamQuestion(${examCurrentIdx + 1})" ${examCurrentIdx === examQuestions.length - 1 ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''}>Next →</button>
+      </div>
+
+      <div class="exam-verdict-btns">
+        <button class="btn sync-btn" onclick="markExamQuestionVerdict('solved')">✓ Solved Correctly (+${qMarks} Mark${qMarks>1?'s':''})</button>
+        <button class="btn danger" onclick="markExamQuestionVerdict('failed')">✗ Still Unsure / Wrong</button>
+      </div>
+    </div>
+  `;
 }
 
 /* Active Study Time Engine */
@@ -922,7 +1357,7 @@ function renderSubjectInactivityRadar(){
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
   return {
-    version: 6,
+    version: 8,
     sync_timestamp: new Date().toISOString(),
     entries: entries(),
     snapshots: snaps(),
@@ -935,6 +1370,7 @@ function buildPayloadObject(){
     revision: getNormalizedRevisionData(),
     revision_totals_by_subject: calculateRevisionCounts(),
     mistakes: mistakesData(),
+    exam_history: getExamHistory(),
     freezes: freezeData()
   };
 }
@@ -978,7 +1414,7 @@ async function triggerAutoSync(silent = true){
       body: JSON.stringify(payload)
     });
     updateSyncStatus("synced");
-    if(!silent) toast("Cloud Auto-Sync completed! Photos, study hours & recency updated.");
+    if(!silent) toast("Cloud Auto-Sync completed! Photos, study hours & exam scores updated.");
   } catch(err){
     console.error("Auto-sync error:", err);
     updateSyncStatus("error");
@@ -1497,7 +1933,9 @@ function addMistakeEntry(){
     question: qSummary || "Visual Problem Log (Check Image)",
     takeaway: takeaway || "Review fundamental concepts.",
     imageBase64: currentBase64Image || null,
-    driveFileUrl: null
+    driveFileUrl: null,
+    resolvedCount: 0,
+    lastResolvedDate: null
   };
   mList.push(entry);
 
@@ -1596,6 +2034,7 @@ function renderMistakes(){
   if(!mLog) return;
   mLog.innerHTML=filtered.length ? filtered.map(x=>{
     const tagClass=tagClassMap[x.type] || "tag-concept";
+    const resolvedTimes = Number(x.resolvedCount || 0);
     const imgHtml = x.imageBase64 
       ? `<img src="${x.imageBase64}" class="mistake-thumb" title="Click to enlarge screenshot" onclick="openLightbox('${x.imageBase64}')">`
       : (x.driveFileUrl ? `<a href="${x.driveFileUrl}" target="_blank" style="color:var(--accent2);font-size:11px">🔗 Drive Photo</a>` : `<span class="muted">—</span>`);
@@ -1608,10 +2047,15 @@ function renderMistakes(){
         <td>${safe(x.question)}</td>
         <td style="color:#b9c3d4">${safe(x.takeaway)}</td>
         <td>${imgHtml}</td>
+        <td>
+          <span class="resolved-badge ${resolvedTimes === 0 ? 'zero' : ''}">
+            ${resolvedTimes > 0 ? `✓ ${resolvedTimes}x` : '0x'}
+          </span>
+        </td>
         <td><button class="btn danger" style="padding:4px 8px;font-size:11px" onclick="removeMistakeEntry(${x.id})">×</button></td>
       </tr>
     `;
-  }).join("") : `<tr><td colspan="7" class="empty">No mistakes logged for ${activeMistakeFilterDate === "ALL" ? 'any date' : label(activeMistakeFilterDate)}. Select another calendar date.</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">No mistakes logged for ${activeMistakeFilterDate === "ALL" ? 'any date' : label(activeMistakeFilterDate)}. Select another calendar date.</td></tr>`;
 }
 
 function renderSubjectTotals(){
@@ -2020,6 +2464,7 @@ function handleImport(e){
       if(x.simulation_params)saveSimParams(x.simulation_params);
       if(x.revision)saveRev(x.revision);
       if(x.mistakes)saveMistakesSafe(x.mistakes);
+      if(x.exam_history)saveExamHistory(x.exam_history);
       if(x.freezes)saveFreezes(x.freezes);
       load();
       toast("Backup restored successfully.");
@@ -2091,7 +2536,7 @@ function init(){
     }
   }
 
-  if($('todayDate'))$('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  if($('todayDate')) $('todayDate').textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   
   const whInput = $("webhookUrlInput");
   if(whInput) whInput.value = getWebhookUrl();
