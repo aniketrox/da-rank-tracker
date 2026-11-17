@@ -821,12 +821,12 @@ function saveMistakesSafe(list){
    CREATE EXAM ENGINE (65 Questions / 100 Marks GATE Pattern)
    ========================================================= */
 let examQuestions = [];
-let examQuestionMarks = []; // Parallel array storing 1 or 2 marks for each question index
+let examQuestionMarks = [];
 let examCurrentIdx = 0;
-let examStatusMap = {}; // { idx: 'solved' | 'failed' }
-let examRevealMap = {}; // { idx: true }
+let examStatusMap = {};
+let examRevealMap = {};
 let examTimerInterval = null;
-let examSecondsLeft = 180 * 60; // 3 hours GATE duration
+let examSecondsLeft = 180 * 60;
 let examLastTick = null;
 let isExamFinished = false;
 
@@ -868,11 +868,8 @@ function buildBalancedExamDeck(allMistakes, targetCount = 65){
 }
 
 function assignGateMarks(deck){
-  // Official GATE pattern: 30 questions of 1 mark, 35 questions of 2 marks = 100 marks total
-  // If deck < 65, assign ~46% as 1-mark and ~54% as 2-mark
   const total = deck.length;
   const oneMarkCount = (total === 65) ? 30 : Math.floor(total * (30 / 65));
-  
   return deck.map((_, idx) => (idx < oneMarkCount) ? 1 : 2);
 }
 
@@ -1012,7 +1009,6 @@ function finishExamSession(){
     examTimerInterval = null;
   }
 
-  // Calculate Marks Breakdown (1-Mark & 2-Mark Questions)
   let rawMarksEarned = 0;
   let totalRawMarksPossible = 0;
   let oneMarkSolved = 0, oneMarkTotal = 0;
@@ -1038,7 +1034,6 @@ function finishExamSession(){
     }
   });
 
-  // Normalize out of 100 if user has < 65 mistakes in vault; exact raw marks if 65 questions
   const marksOutOf100 = totalRawMarksPossible > 0 
     ? Number(((rawMarksEarned / totalRawMarksPossible) * 100).toFixed(2))
     : 0;
@@ -1046,7 +1041,6 @@ function finishExamSession(){
   const elapsedSeconds = (180 * 60) - examSecondsLeft;
   const timeSpentDisplay = elapsedSeconds >= 60 ? formatHoursMinutes(elapsedSeconds) : `${elapsedSeconds}s`;
 
-  // Save to exam history
   const history = getExamHistory();
   history.push({
     id: Date.now(),
@@ -1063,7 +1057,6 @@ function finishExamSession(){
   });
   saveExamHistory(history);
 
-  // Render Final Scorecard Inside Modal
   $("examFinishBtn").style.display = "none";
   $("examNavPalette").style.display = "none";
   $("examHeaderSub").textContent = "Exam Completed · Performance Report & Marks Breakdown";
@@ -1188,7 +1181,10 @@ function renderExamQuestion(){
   `;
 }
 
-/* Active Study Time Engine */
+/* Active Study Time & Average Pace Engine */
+let sessionElapsedSeconds = 0; // Tracks elapsed seconds in the current timer/pomo session
+let lastBatchPaceText = null;  // Stores the most recent batch pace if logged during a session
+
 function getTodayActiveStudySeconds(){
   const data = getStudyTimeData();
   return Number(data[today()] || 0);
@@ -1214,6 +1210,30 @@ function renderStudyHoursDisplay(){
   const sec = getTodayActiveStudySeconds();
   const el = $("todayActiveStudyHours");
   if(el) el.textContent = sec >= 60 ? formatHoursMinutes(sec) : "0h 00m";
+  renderAvgPaceDisplay();
+}
+
+function renderAvgPaceDisplay(){
+  const paceEl = $("timerPaceFeedback");
+  if(!paceEl) return;
+
+  const todaySec = getTodayActiveStudySeconds();
+  const todayQ = entries().filter(x => x.entry_date === today()).reduce((a, x) => a + Number(x.questions), 0);
+
+  if(todayQ > 0 && todaySec >= 10){
+    const overallPace = ((todaySec / 60) / todayQ).toFixed(1);
+    if(lastBatchPaceText){
+      paceEl.textContent = `${lastBatchPaceText} · Today Avg: ${overallPace} min / problem`;
+    } else {
+      paceEl.textContent = `Today Avg Pace: ${overallPace} min / problem`;
+    }
+  } else if(lastBatchPaceText){
+    paceEl.textContent = lastBatchPaceText;
+  } else if(todayQ > 0 && todaySec < 10){
+    paceEl.textContent = `Avg Pace: Start timer to track min / problem`;
+  } else {
+    paceEl.textContent = `Avg Pace: — min / problem`;
+  }
 }
 
 /* Subject Inactivity & Recency Radar Engine with Configurable Daily Quotas */
@@ -1357,7 +1377,7 @@ function renderSubjectInactivityRadar(){
 /* Webhook & Auto-Sync Engine */
 function buildPayloadObject(){
   return {
-    version: 8,
+    version: 9,
     sync_timestamp: new Date().toISOString(),
     entries: entries(),
     snapshots: snaps(),
@@ -1503,6 +1523,7 @@ function setTimerPreset(presetKey, targetSec){
   
   currentTimerPresetKey = presetKey;
   currentPresetTargetSeconds = targetSec;
+  sessionElapsedSeconds = 0;
   
   Object.keys(PRESETS).forEach(k => {
     const el = $("mode_" + k);
@@ -1521,7 +1542,10 @@ function toggleTimer(){
   if(isTimerRunning){
     if(lastTickTimestamp){
       const elapsedSec = Math.floor((Date.now() - lastTickTimestamp) / 1000);
-      if(elapsedSec > 0) addActiveStudySeconds(elapsedSec);
+      if(elapsedSec > 0){
+        sessionElapsedSeconds += elapsedSec;
+        addActiveStudySeconds(elapsedSec);
+      }
     }
     clearInterval(timerInterval);
     isTimerRunning = false;
@@ -1546,6 +1570,7 @@ function toggleTimer(){
       
       if(deltaSec >= 1){
         lastTickTimestamp = now;
+        sessionElapsedSeconds += deltaSec;
         addActiveStudySeconds(deltaSec);
 
         if(currentPresetTargetSeconds === 0){
@@ -1577,8 +1602,11 @@ function toggleTimer(){
 
 function resetTimer(){
   if(isTimerRunning) toggleTimer();
+  sessionElapsedSeconds = 0;
+  lastBatchPaceText = null;
   timerSeconds = (currentPresetTargetSeconds > 0) ? currentPresetTargetSeconds : 0;
   updateTimerDisplay();
+  renderAvgPaceDisplay();
 }
 
 /* Daily Goal Bar Logic */
@@ -2414,10 +2442,12 @@ function addEntry(){
   const es=entries(),todayQuestions=es.filter(x=>x.entry_date===today()).reduce((a,x)=>a+ +x.questions,0);
   if(todayQuestions+q<3){toast(`You must solve at least 3 problems today. Add ${3-todayQuestions} more.`);return}
   
-  if(timerSeconds > 0 && currentPresetTargetSeconds === 0){
-    const avgPaceMinutes = (timerSeconds / 60 / q).toFixed(1);
-    const paceEl = $("timerPaceFeedback");
-    if(paceEl) paceEl.textContent = `Last Batch: ${avgPaceMinutes} min / question`;
+  // Calculate batch pace from either active session time or total today's study time
+  const activeSecForBatch = sessionElapsedSeconds > 0 ? sessionElapsedSeconds : getTodayActiveStudySeconds();
+  if(activeSecForBatch >= 10){
+    const avgPaceMinutes = (activeSecForBatch / 60 / q).toFixed(1);
+    lastBatchPaceText = `Last Batch: ${avgPaceMinutes} min / problem`;
+    sessionElapsedSeconds = 0; // Reset batch counter for the next problem batch
   }
 
   const e={id:Date.now(),entry_date:today(),subject:$('subject').value,difficulty:$('difficulty').value,questions:q,points:pointsFor($('subject').value,$('difficulty').value,q),created_at:new Date().toISOString()};
